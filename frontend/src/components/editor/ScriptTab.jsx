@@ -24,6 +24,7 @@ const ScriptTab = ({ project, onChange, onGenerate, loading }) => {
 
   return (
     <div className="space-y-6">
+      {/* Header with full width */}
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-gray-900">Script & Project Details</h3>
         <button
@@ -46,19 +47,42 @@ const ScriptTab = ({ project, onChange, onGenerate, loading }) => {
         </button>
       </div>
 
-      {/* Title */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Project Title *
-        </label>
-        <input
-          type="text"
-          value={project.title || ''}
-          onChange={(e) => onChange({ title: e.target.value })}
-          className="input-field"
-          placeholder="Enter project title"
-          data-testid="project-title-input"
-        />
+      {/* Title and Language - Same line on md+ */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Title takes more space */}
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Project Title *
+          </label>
+          <input
+            type="text"
+            value={project.title || ''}
+            onChange={(e) => onChange({ title: e.target.value })}
+            className="input-field"
+            placeholder="Enter project title"
+            data-testid="project-title-input"
+          />
+        </div>
+
+        {/* Language */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Language *
+          </label>
+          <select
+            value={project.language || 'en'}
+            onChange={(e) => onChange({ language: e.target.value })}
+            className="input-field"
+            data-testid="project-language-select"
+          >
+            <option value="en">English</option>
+            <option value="fr">French</option>
+            <option value="es">Spanish</option>
+            <option value="de">German</option>
+            <option value="it">Italian</option>
+            <option value="pt">Portuguese</option>
+          </select>
+        </div>
       </div>
 
       {/* Description */}
@@ -76,65 +100,48 @@ const ScriptTab = ({ project, onChange, onGenerate, loading }) => {
         />
       </div>
 
-      {/* Language */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Language *
-        </label>
-        <select
-          value={project.language || 'en'}
-          onChange={(e) => onChange({ language: e.target.value })}
-          className="input-field"
-          data-testid="project-language-select"
-        >
-          <option value="en">English</option>
-          <option value="fr">French</option>
-          <option value="es">Spanish</option>
-          <option value="de">German</option>
-          <option value="it">Italian</option>
-          <option value="pt">Portuguese</option>
-        </select>
-      </div>
+      {/* Use Case and Style - Same line */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Use Case */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Use Case *
+          </label>
+          <select
+            value={project.use_case || 'explanation'}
+            onChange={(e) => onChange({ use_case: e.target.value })}
+            className="input-field"
+            data-testid="project-usecase-select"
+          >
+            <option value="storytelling">Storytelling</option>
+            <option value="youtube_short">YouTube Short</option>
+            <option value="explanation">Explanation</option>
+            <option value="commercial">Commercial</option>
+            <option value="inspirational">Inspirational</option>
+            <option value="educational">Educational</option>
+            <option value="tutorial">Tutorial</option>
+          </select>
+        </div>
 
-      {/* Use Case */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Use Case *
-        </label>
-        <select
-          value={project.use_case || 'explanation'}
-          onChange={(e) => onChange({ use_case: e.target.value })}
-          className="input-field"
-          data-testid="project-usecase-select"
-        >
-          <option value="storytelling">Storytelling</option>
-          <option value="youtube_short">YouTube Short</option>
-          <option value="explanation">Explanation</option>
-          <option value="commercial">Commercial</option>
-          <option value="inspirational">Inspirational</option>
-          <option value="educational">Educational</option>
-          <option value="tutorial">Tutorial</option>
-        </select>
-      </div>
-
-      {/* Script Style */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Script Style
-        </label>
-        <select
-          value={project.script_style || 'educational'}
-          onChange={(e) => onChange({ script_style: e.target.value })}
-          className="input-field"
-          data-testid="script-style-select"
-        >
-          <option value="educational">Educational</option>
-          <option value="inspirational">Inspirational</option>
-          <option value="comedic">Comedic</option>
-          <option value="dramatic">Dramatic</option>
-          <option value="casual">Casual</option>
-          <option value="professional">Professional</option>
-        </select>
+        {/* Script Style */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Script Style
+          </label>
+          <select
+            value={project.script_style || 'educational'}
+            onChange={(e) => onChange({ script_style: e.target.value })}
+            className="input-field"
+            data-testid="script-style-select"
+          >
+            <option value="educational">Educational</option>
+            <option value="inspirational">Inspirational</option>
+            <option value="comedic">Comedic</option>
+            <option value="dramatic">Dramatic</option>
+            <option value="casual">Casual</option>
+            <option value="professional">Professional</option>
+          </select>
+        </div>
       </div>
 
       {/* Video Inspirations */}
@@ -174,26 +181,6 @@ const ScriptTab = ({ project, onChange, onGenerate, loading }) => {
           <Plus className="w-4 h-4" />
           Add Video Inspiration
         </button>
-      </div>
-
-      {/* Script Content */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Script Content
-        </label>
-        <textarea
-          value={project.script_text || ''}
-          onChange={(e) => onChange({ script_text: e.target.value })}
-          className="input-field font-mono text-sm"
-          rows={12}
-          placeholder="Enter your script here or generate one..."
-          data-testid="script-text-area"
-        />
-        
-        <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
-          <span data-testid="character-count">{characterCount} characters</span>
-          <span data-testid="estimated-duration">~{estimatedDuration} seconds</span>
-        </div>
       </div>
     </div>
   );

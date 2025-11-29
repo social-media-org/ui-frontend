@@ -368,9 +368,29 @@ const ProjectEditorPage = () => {
             )}
           </div>
 
-          {/* Right Column - Preview */}
+          {/* Right Column - Preview or Script Content */}
           <div className="w-1/2 overflow-y-auto p-8 bg-gray-50" data-testid="preview-column">
-            <PreviewPanel project={project} activeTab={activeTab} />
+            {activeTab === 'script' ? (
+              /* Script Content */
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900">Script Content</h3>
+                <textarea
+                  value={project.script_text || ''}
+                  onChange={(e) => handleChange({ script_text: e.target.value })}
+                  className="input-field font-mono text-sm w-full"
+                  rows={25}
+                  placeholder="Enter your script here or generate one..."
+                  data-testid="script-content-area"
+                />
+                <div className="flex items-center justify-between text-xs text-gray-500">
+                  <span>{(project.script_text || '').length} characters</span>
+                  <span>~{Math.ceil((project.script_text || '').length / 2.5)} seconds</span>
+                </div>
+              </div>
+            ) : (
+              /* Preview Panel for other tabs */
+              <PreviewPanel project={project} activeTab={activeTab} />
+            )}
           </div>
         </div>
       </div>
