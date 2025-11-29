@@ -43,32 +43,32 @@ export const projectsAPI = {
   },
 
   // Generate script
-  generateScript: async (id, data) => {
-    const response = await api.post(`/projects/${id}/generate-script`, data);
+  generateScript: async (projectId, data) => {
+    const response = await api.post(`/scripts/${projectId}`, data);
     return response.data;
   },
 
   // Generate audio
-  generateAudio: async (id, data) => {
-    const response = await api.post(`/projects/${id}/generate-audio`, data);
+  generateAudio: async (projectId, data) => {
+    const response = await api.post(`/audios/${projectId}`, data);
     return response.data;
   },
 
   // Generate images
-  generateImages: async (id, data) => {
-    const response = await api.post(`/projects/${id}/generate-images`, data);
+  generateImages: async (projectId, data) => {
+    const response = await api.post(`/images/${projectId}`, data);
     return response.data;
   },
 
   // Generate single image for a scene
-  generateSingleImage: async (id, sceneIndex, data) => {
-    const response = await api.post(`/projects/${id}/generate-images/${sceneIndex}`, data);
+  generateSingleImage: async (projectId, sceneIndex, data) => {
+    const response = await api.post(`/images/${projectId}/${sceneIndex}`, data);
     return response.data;
   },
 
   // Generate video
-  generateVideo: async (id, data) => {
-    const response = await api.post(`/projects/${id}/generate-video`, data);
+  generateVideo: async (projectId, data) => {
+    const response = await api.post(`/video/${projectId}`, data);
     return response.data;
   },
 };

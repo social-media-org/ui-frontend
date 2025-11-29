@@ -169,10 +169,10 @@ Response: 200 OK
 
 #### 6. Generate Script
 ```http
-POST /projects/:id/generate-script
+POST /scripts/:projectId
 
 Path Parameters:
-  - id: string (project ID)
+  - projectId: string (project ID)
 
 Request Body:
 {
@@ -193,10 +193,10 @@ Response:
 
 #### 7. Generate Audio
 ```http
-POST /projects/:id/generate-audio
+POST /audios/:projectId
 
 Path Parameters:
-  - id: string (project ID)
+  - projectId: string (project ID)
 
 Request Body:
 {
@@ -238,10 +238,10 @@ Response:
 
 #### 9. Generate Single Image (for specific scene)
 ```http
-POST /images/:projectid/:sceneIndex
+POST /images/:projectId/:sceneIndex
 
 Path Parameters:
-  - projectid: string (project ID)
+  - projectId: string (project ID)
   - sceneIndex: number (index of the scene, 0-based)
 
 Request Body:
@@ -259,10 +259,10 @@ Response:
 
 #### 10. Generate Video
 ```http
-POST /projects/:id/generate-video
+POST /video/:projectId
 
 Path Parameters:
-  - id: string (project ID)
+  - projectId: string (project ID)
 
 Request Body:
 {
