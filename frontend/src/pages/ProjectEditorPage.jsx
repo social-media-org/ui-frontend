@@ -3,7 +3,6 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Save, Loader } from 'lucide-react';
 import clsx from 'clsx';
 import StatusBadge from '../components/StatusBadge';
-import DetailsTab from '../components/editor/DetailsTab';
 import ScriptTab from '../components/editor/ScriptTab';
 import AudioTab from '../components/editor/AudioTab';
 import ImagesTab from '../components/editor/ImagesTab';
@@ -41,14 +40,13 @@ const ProjectEditorPage = () => {
     duration: 0,
   });
 
-  const [activeTab, setActiveTab] = useState('details');
+  const [activeTab, setActiveTab] = useState('script');
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [generating, setGenerating] = useState({});
   const [lastSaved, setLastSaved] = useState(null);
 
   const tabs = [
-    { id: 'details', label: 'Details' },
     { id: 'script', label: 'Script' },
     { id: 'audio', label: 'Audio' },
     { id: 'images', label: 'Images' },
@@ -335,9 +333,6 @@ const ProjectEditorPage = () => {
         <div className="h-full flex">
           {/* Left Column - Form */}
           <div className="w-1/2 overflow-y-auto p-8 border-r border-gray-200" data-testid="form-column">
-            {activeTab === 'details' && (
-              <DetailsTab project={project} onChange={handleChange} />
-            )}
             {activeTab === 'script' && (
               <ScriptTab
                 project={project}

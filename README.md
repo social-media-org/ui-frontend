@@ -334,7 +334,7 @@ interface Project {
 - Actions: Edit, Preview, Generate (script/audio/images/video), Delete
 
 #### 2. ProjectEditorPage
-- Éditeur avec 5 onglets: Details, Script, Audio, Images, Video
+- Éditeur avec 4 onglets: Script, Audio, Images, Video
 - Layout à 2 colonnes: Formulaire + Prévisualisation en direct
 - Actions de génération par section
 - Sauvegarde automatique
@@ -365,8 +365,7 @@ Props: `status`
 - **PreviewModal**: Prévisualisation vidéo
 
 #### Editor Components
-- **DetailsTab**: Formulaire de détails du projet
-- **ScriptTab**: Génération et édition de script
+- **ScriptTab**: Détails du projet et génération/édition de script (fusion de Details + Script)
 - **AudioTab**: Configuration audio et sélection de voix
 - **ImagesTab**: Gestion des prompts et images par scène
 - **VideoTab**: Configuration vidéo finale
