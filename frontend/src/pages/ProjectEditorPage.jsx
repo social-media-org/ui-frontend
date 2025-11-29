@@ -369,7 +369,7 @@ const ProjectEditorPage = () => {
           </div>
 
           {/* Right Column - Preview or Script Content */}
-          <div className="w-1/2 overflow-y-auto p-8 bg-gray-50" data-testid="preview-column">
+          <div className="w-1/2 overflow-y-auto p-8 pt-6 bg-gray-50" data-testid="preview-column">
             {activeTab === 'script' ? (
               /* Script Content */
               <div className="space-y-4">

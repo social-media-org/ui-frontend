@@ -31,7 +31,7 @@ const PreviewPanel = ({ project, activeTab }) => {
         return (
           <div className="space-y-4">
             {project.script_text ? (
-              <div className="bg-white rounded-lg p-6 border border-gray-200">
+              <div className="pt-6">
                 <div className="flex items-center gap-2 mb-4 text-primary-600">
                   <FileText className="w-5 h-5" />
                   <span className="font-medium">Script Preview</span>
@@ -56,7 +56,7 @@ const PreviewPanel = ({ project, activeTab }) => {
         return (
           <div className="space-y-4">
             {project.audio_url ? (
-              <div className="bg-white rounded-lg p-6 border border-gray-200">
+              <div className="pt-6">
                 <div className="flex items-center gap-2 mb-4 text-primary-600">
                   <Mic className="w-5 h-5" />
                   <span className="font-medium">Audio Preview</span>
@@ -84,7 +84,7 @@ const PreviewPanel = ({ project, activeTab }) => {
         return (
           <div className="space-y-4">
             {project.images_urls && project.images_urls.length > 0 ? (
-              <div className="bg-white rounded-lg p-6 border border-gray-200">
+              <div className="pt-6">
                 <div className="flex items-center gap-2 mb-4 text-primary-600">
                   <Image className="w-5 h-5" />
                   <span className="font-medium">Images Preview</span>
@@ -160,11 +160,7 @@ const PreviewPanel = ({ project, activeTab }) => {
   };
 
   return (
-    <div className="bg-gray-50 rounded-xl p-6 h-full" data-testid="live-preview-panel">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-        <Clock className="w-5 h-5 text-primary-600" />
-        Live Preview: {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
-      </h3>
+    <div className="rounded-xl h-full" data-testid="live-preview-panel">
       <div className="flex items-center justify-center min-h-[400px]">
         {renderPreview()}
       </div>
