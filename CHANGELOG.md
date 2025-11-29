@@ -277,7 +277,7 @@ Configuration pour production :
 
 ### Phase 1 : Backend
 - [ ] Implémenter FastAPI backend selon `API_GUIDE.md`
-- [ ] Intégrer MongoDB ou PostgreSQL
+- [ ] Intégrer MongoDB 
 - [ ] Créer les endpoints CRUD
 - [ ] Implémenter les services de génération IA
 

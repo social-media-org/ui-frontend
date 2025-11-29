@@ -107,7 +107,7 @@ class ScriptService:
             return response.json()
 ```
 
-## 📊 Modèle de Données (MongoDB/PostgreSQL)
+## 📊 Modèle de Données (MongoDB)
 
 ### Collection/Table: `projects`
 
@@ -640,8 +640,7 @@ class VideoService:
 ```env
 # Database
 DATABASE_URL=mongodb://localhost:27017/ai_studio
-# ou
-DATABASE_URL=postgresql://user:password@localhost/ai_studio
+
 
 # Microservices URLs
 SCRIPT_SERVICE_URL=http://script-service:8001
@@ -761,7 +760,7 @@ volumes:
 ## ✅ Checklist d'Implémentation
 
 ### Backend Core
-- [ ] Configuration base de données (MongoDB/PostgreSQL)
+- [ ] Configuration base de données (MongoDB)
 - [ ] Modèle Project avec nouveau format images
 - [ ] CORS configuré pour frontend
 - [ ] Gestion d'erreurs appropriée
