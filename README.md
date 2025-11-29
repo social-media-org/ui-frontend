@@ -217,10 +217,10 @@ Response:
 
 #### 8. Generate All Images
 ```http
-POST /projects/:id/generate-images
+POST /images/:projectId
 
 Path Parameters:
-  - id: string (project ID)
+  - projectId: string (project ID)
 
 Request Body:
 {
@@ -230,7 +230,7 @@ Request Body:
 
 Response:
 {
-  "images_urls": ["string", "string", ...],
+  "images_prompts": [ {url : "", prompt: ""}],
   "status": "images_ready",
   "updatedAt": "ISO date string"
 }
@@ -238,10 +238,10 @@ Response:
 
 #### 9. Generate Single Image (for specific scene)
 ```http
-POST /projects/:id/generate-images/:sceneIndex
+POST /images/:projectid/:sceneIndex
 
 Path Parameters:
-  - id: string (project ID)
+  - projectid: string (project ID)
   - sceneIndex: number (index of the scene, 0-based)
 
 Request Body:
@@ -305,7 +305,7 @@ interface Project {
   
   // Images
   image_style: string; // realistic, pixar, anime, flat_design, watercolor, oil_painting, sketch
-  images_prompts: string[];
+  images_prompts: [ {url : "", prompt: ""}];
   images_urls: string[];
   
   // Video
