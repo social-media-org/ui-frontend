@@ -81,20 +81,21 @@ const PreviewPanel = ({ project, activeTab }) => {
         );
 
       case 'images':
+        const images = project.images || [];
         return (
           <div className="space-y-4">
-            {project.images_urls && project.images_urls.length > 0 ? (
-              <div className="pt-6">
+            {images.length > 0 && images.some(img => img.url) ? (
+              <div className="bg-white rounded-lg p-6 border border-gray-200">
                 <div className="flex items-center gap-2 mb-4 text-primary-600">
                   <Image className="w-5 h-5" />
                   <span className="font-medium">Images Preview</span>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  {project.images_urls.map((url, index) => (
-                    url && (
+                  {images.map((image, index) => (
+                    image.url && (
                       <div key={index} className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
                         <img
-                          src={url}
+                          src={image.url}
                           alt={`Scene ${index + 1}`}
                           className="w-full h-full object-cover"
                         />

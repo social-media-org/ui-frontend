@@ -2,22 +2,23 @@ import React from 'react';
 import { Image, Loader, Plus, X, RefreshCw } from 'lucide-react';
 
 const ImagesTab = ({ project, onChange, onGenerate, onGenerateSingle, loading }) => {
+  // Support new format: images array of {prompt, url}
+  const images = project.images || [];
+  
   const handleAddScenePrompt = () => {
-    const newPrompts = [...(project.images_prompts || []), ''];
-    const newUrls = [...(project.images_urls || []), null];
-    onChange({ images_prompts: newPrompts, images_urls: newUrls });
+    const newImages = [...images, { prompt: '', url: null }];
+    onChange({ images: newImages });
   };
 
   const handlePromptChange = (index, value) => {
-    const newPrompts = [...project.images_prompts];
-    newPrompts[index] = value;
-    onChange({ images_prompts: newPrompts });
+    const newImages = [...images];
+    newImages[index] = { ...newImages[index], prompt: value };
+    onChange({ images: newImages });
   };
 
   const handleRemoveScene = (index) => {
-    const newPrompts = project.images_prompts.filter((_, i) => i !== index);
-    const newUrls = project.images_urls.filter((_, i) => i !== index);
-    onChange({ images_prompts: newPrompts, images_urls: newUrls });
+    const newImages = images.filter((_, i) => i !== index);
+    onChange({ images: newImages });
   };
 
   return (
@@ -26,7 +27,7 @@ const ImagesTab = ({ project, onChange, onGenerate, onGenerateSingle, loading })
         <h3 className="text-lg font-semibold text-gray-900">Image Generation</h3>
         <button
           onClick={onGenerate}
-          disabled={loading || (project.images_prompts || []).length === 0}
+          disabled={loading || images.length === 0}
           className="btn-primary flex items-center gap-2"
           data-testid="generate-all-images-button"
         >
@@ -73,13 +74,13 @@ const ImagesTab = ({ project, onChange, onGenerate, onGenerateSingle, loading })
         <p className="text-xs text-gray-500 mb-4">One prompt per scene</p>
 
         <div className="space-y-4">
-          {(project.images_prompts || []).map((prompt, index) => (
+          {images.map((image, index) => (
             <div key={index} className="bg-gray-50 rounded-lg p-4 space-y-3">
               <div className="flex items-start gap-2">
                 <div className="flex-1">
                   <input
                     type="text"
-                    value={prompt}
+                    value={image.prompt}
                     onChange={(e) => handlePromptChange(index, e.target.value)}
                     className="input-field"
                     placeholder={`Describe scene ${index + 1}...`}
@@ -96,10 +97,10 @@ const ImagesTab = ({ project, onChange, onGenerate, onGenerateSingle, loading })
               </div>
 
               {/* Image Preview */}
-              {project.images_urls && project.images_urls[index] && (
+              {image.url && (
                 <div className="relative aspect-video bg-gray-200 rounded-lg overflow-hidden">
                   <img
-                    src={project.images_urls[index]}
+                    src={image.url}
                     alt={`Scene ${index + 1}`}
                     className="w-full h-full object-cover"
                     data-testid={`scene-image-${index}`}
@@ -111,14 +112,14 @@ const ImagesTab = ({ project, onChange, onGenerate, onGenerateSingle, loading })
               <div className="flex gap-2">
                 <button
                   onClick={() => onGenerateSingle(index)}
-                  disabled={loading || !prompt}
+                  disabled={loading || !image.prompt}
                   className="btn-secondary text-sm flex items-center gap-2"
                   data-testid={`generate-scene-${index}`}
                 >
                   <Image className="w-4 h-4" />
                   Generate
                 </button>
-                {project.images_urls && project.images_urls[index] && (
+                {image.url && (
                   <button
                     onClick={() => onGenerateSingle(index)}
                     disabled={loading}

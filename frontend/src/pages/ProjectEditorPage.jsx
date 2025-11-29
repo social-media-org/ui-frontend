@@ -29,8 +29,7 @@ const ProjectEditorPage = () => {
     audio_pitch: 1.0,
     audio_url: null,
     image_style: 'realistic',
-    images_prompts: [],
-    images_urls: [],
+    images: [], // New format: array of {prompt: string, url: string}
     resolution: '1080p',
     fps: 30,
     video_template_id: 'basic_fade',
@@ -169,13 +168,13 @@ const ProjectEditorPage = () => {
       const updatedProject = await projectsAPI.generateImages(
         isNewProject ? 'temp' : id,
         {
-          prompts: project.images_prompts,
+          images: project.images,
           style: project.image_style,
         }
       );
 
       handleChange({
-        images_urls: updatedProject.images_urls,
+        images: updatedProject.images,
         status: 'images_ready',
       });
 
@@ -196,16 +195,19 @@ const ProjectEditorPage = () => {
         isNewProject ? 'temp' : id,
         sceneIndex,
         {
-          prompt: project.images_prompts[sceneIndex],
+          prompt: project.images[sceneIndex].prompt,
           style: project.image_style,
         }
       );
 
       // Update only the specific image URL
-      const newUrls = [...project.images_urls];
-      newUrls[sceneIndex] = updatedProject.image_url;
+      const newImages = [...project.images];
+      newImages[sceneIndex] = {
+        ...newImages[sceneIndex],
+        url: updatedProject.image_url
+      };
 
-      handleChange({ images_urls: newUrls });
+      handleChange({ images: newImages });
 
       alert(`Image for scene ${sceneIndex + 1} generated successfully!`);
     } catch (error) {

@@ -16,15 +16,11 @@
       "audio_pitch": 1,
       "audio_url": "https://example.com/audio/project-1.mp3",
       "image_style": "realistic",
-      "images_prompts": [
-        "A futuristic AI brain with glowing neural connections",
-        "Modern hospital with AI-assisted surgery",
-        "Self-driving cars on a smart highway"
-      ],
-      "images_urls": [
-        "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=600&fit=crop",
-        "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=600&fit=crop",
-        "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&h=600&fit=crop"
+      "images": [
+        {"prompt" : "A futuristic AI brain with glowing neural connections", 
+          "url" : "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=600&fit=crop"},
+        {"prompt" :"Modern hospital with AI-assisted surgery", "url" : "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=600&fit=crop"},
+        {"prompt" :"Self-driving cars on a smart highway", "url" : "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&h=600&fit=crop" }
       ],
       "resolution": "1080p",
       "fps": 30,

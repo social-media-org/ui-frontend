@@ -11,25 +11,100 @@ Créer un backend orchestrateur (UI-Service) qui :
 2. Orchestre les appels aux microservices de génération IA
 3. Respecte les contrats API définis par le frontend
 
+## 🏗️ Architecture Recommandée
+
+### Principe de Conception
+
+**IMPORTANT**: Le backend sert d'**orchestrateur/intermédiaire** entre le frontend et les microservices. Il NE DOIT PAS contenir de logique métier.
+
+- ✅ **Routes**: Valident les entrées, appellent les services
+- ✅ **Services**: Effectuent des appels REST aux microservices cibles
+- ❌ **PAS de traitement métier dans les routes**: Toute logique doit être déléguée aux microservices
+
+### Exemple de Flux
+
+```
+Frontend → Backend Route → Backend Service → Microservice (Script/Audio/Image/Video)
+                                              ↓
+                                          Traitement IA
+                                              ↓
+Frontend ← Backend Route ← Backend Service ← Microservice
+```
+
 ## 🗂️ Structure Recommandée
 
 ```
 backend/
 ├── app/
-│   ├── main.py              # FastAPI app principale
+│   ├── main.py                    # FastAPI app principale
+│   ├── config.py                  # Configuration & env vars
+│   ├── database.py                # Configuration DB
+│   │
 │   ├── models/
-│   │   └── project.py       # Modèles Pydantic/DB
-│   ├── routes/
-│   │   ├── projects.py      # CRUD endpoints
-│   │   └── generation.py    # AI generation endpoints
-│   ├── services/
-│   │   ├── script_service.py    # Génération script
-│   │   ├── audio_service.py     # Génération audio
-│   │   ├── image_service.py     # Génération images
-│   │   └── video_service.py     # Génération vidéo
-│   └── database.py          # Configuration DB
+│   │   └── project.py             # Modèles Pydantic/DB
+│   │
+│   ├── routes/                    # Routes par domaine
+│   │   ├── projects.py            # CRUD projets
+│   │   ├── script.py              # Routes génération script
+│   │   ├── audio.py               # Routes génération audio
+│   │   ├── images.py              # Routes génération images
+│   │   └── video.py               # Routes génération vidéo
+│   │
+│   └── services/                  # Services = appels REST aux microservices
+│       ├── project_service.py     # Gestion projets DB
+│       ├── script_service.py      # Appels microservice script
+│       ├── audio_service.py       # Appels microservice audio
+│       ├── image_service.py       # Appels microservice image
+│       └── video_service.py       # Appels microservice vidéo
+│
 ├── requirements.txt
 └── .env
+```
+
+### Exemple d'Organisation par Domaine
+
+**routes/script.py** (Route uniquement)
+```python
+from fastapi import APIRouter, Depends
+from services.script_service import ScriptService
+
+router = APIRouter(prefix="/projects", tags=["script"])
+
+@router.post("/{project_id}/generate-script")
+async def generate_script(
+    project_id: str,
+    data: ScriptGenerationRequest,
+    script_service: ScriptService = Depends()
+):
+    # Validation uniquement, pas de logique métier
+    result = await script_service.generate_script(project_id, data)
+    return result
+```
+
+**services/script_service.py** (Service = appel REST au microservice)
+```python
+import httpx
+from config import settings
+
+class ScriptService:
+    def __init__(self):
+        self.script_api_url = settings.SCRIPT_SERVICE_URL
+    
+    async def generate_script(self, project_id: str, data):
+        """Appel REST au microservice de génération de script"""
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                f"{self.script_api_url}/generate",
+                json={
+                    "title": data.title,
+                    "description": data.description,
+                    "use_case": data.use_case,
+                    "language": data.language,
+                    "style": data.style
+                }
+            )
+            response.raise_for_status()
+            return response.json()
 ```
 
 ## 📊 Modèle de Données (MongoDB/PostgreSQL)
@@ -55,10 +130,14 @@ backend/
   "audio_pitch": "number (0.7 - 1.3)",
   "audio_url": "string | null",
   
-  // Images
+  // Images - FORMAT IMPORTANT
   "image_style": "string (realistic, pixar, anime, flat_design, watercolor, oil_painting, sketch)",
-  "images_prompts": ["string"],
-  "images_urls": ["string"],
+  "images": [
+    {
+      "prompt": "string",
+      "url": "string | null"
+    }
+  ],
   
   // Video
   "resolution": "string (720p, 1080p, 1440p, 2160p)",
@@ -76,9 +155,13 @@ backend/
 }
 ```
 
-## 🔌 Endpoints à Implémenter
+## 🔌 API Endpoints par Domaine
 
-### 1. GET /projects
+---
+
+## 1️⃣ DOMAINE: PROJETS (CRUD)
+
+### GET /projects
 
 **Description**: Récupérer tous les projets avec pagination et filtres optionnels
 
@@ -96,54 +179,49 @@ backend/
     "title": "The Future of AI",
     "description": "...",
     "status": "video_ready",
+    "images": [
+      {"prompt": "AI brain", "url": "https://..."},
+      {"prompt": "Future city", "url": "https://..."}
+    ],
     ...
   }
 ]
 ```
 
-**Exemple d'implémentation (FastAPI):**
+**Service Architecture**:
 ```python
+# routes/projects.py
 @router.get("/projects")
 async def get_projects(
     status: Optional[str] = None,
     search: Optional[str] = None,
-    db: Session = Depends(get_db)
+    project_service: ProjectService = Depends()
 ):
-    query = db.query(Project)
-    
-    if status:
-        query = query.filter(Project.status == status)
-    
-    if search:
-        query = query.filter(
-            or_(
-                Project.title.ilike(f"%{search}%"),
-                Project.description.ilike(f"%{search}%")
-            )
-        )
-    
-    projects = query.order_by(Project.updated_at.desc()).all()
-    return projects
+    return await project_service.get_all(status, search)
+
+# services/project_service.py
+class ProjectService:
+    async def get_all(self, status, search):
+        # Accès DB uniquement, pas d'appel microservice
+        query = db.query(Project)
+        if status:
+            query = query.filter(Project.status == status)
+        if search:
+            query = query.filter(...)
+        return query.all()
 ```
 
 ---
 
-### 2. GET /projects/:id
+### GET /projects/:id
 
 **Description**: Récupérer un projet spécifique
 
 **Response**: `200 OK` ou `404 Not Found`
-```json
-{
-  "id": "1",
-  "title": "The Future of AI",
-  ...
-}
-```
 
 ---
 
-### 3. POST /projects
+### POST /projects
 
 **Description**: Créer un nouveau projet
 
@@ -163,34 +241,15 @@ async def get_projects(
   "id": "generated-id",
   "title": "My New Project",
   "status": "draft",
+  "images": [],
   "created_at": "2025-11-29T10:00:00Z",
   ...
 }
 ```
 
-**Exemple d'implémentation:**
-```python
-@router.post("/projects", status_code=201)
-async def create_project(project_data: ProjectCreate, db: Session = Depends(get_db)):
-    new_project = Project(
-        id=str(uuid.uuid4()),
-        title=project_data.title,
-        description=project_data.description,
-        language=project_data.language,
-        use_case=project_data.use_case,
-        status="draft",
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow()
-    )
-    db.add(new_project)
-    db.commit()
-    db.refresh(new_project)
-    return new_project
-```
-
 ---
 
-### 4. PUT /projects/:id
+### PUT /projects/:id
 
 **Description**: Mettre à jour un projet
 
@@ -198,7 +257,9 @@ async def create_project(project_data: ProjectCreate, db: Session = Depends(get_
 ```json
 {
   "title": "Updated Title",
-  "description": "Updated description"
+  "images": [
+    {"prompt": "Updated prompt", "url": null}
+  ]
 }
 ```
 
@@ -206,17 +267,19 @@ async def create_project(project_data: ProjectCreate, db: Session = Depends(get_
 
 ---
 
-### 5. DELETE /projects/:id
+### DELETE /projects/:id
 
 **Description**: Supprimer un projet
 
-**Response**: `204 No Content` ou `200 OK`
+**Response**: `204 No Content`
 
 ---
 
-### 6. POST /projects/:id/generate-script
+## 2️⃣ DOMAINE: SCRIPT
 
-**Description**: Générer le script d'un projet
+### POST /projects/:id/generate-script
+
+**Description**: Générer le script d'un projet (appelle le microservice Script)
 
 **Request Body**:
 ```json
@@ -238,46 +301,50 @@ async def create_project(project_data: ProjectCreate, db: Session = Depends(get_
 }
 ```
 
-**Implémentation recommandée:**
+**Architecture Service**:
 
 ```python
+# routes/script.py
 @router.post("/projects/{project_id}/generate-script")
 async def generate_script(
     project_id: str,
     data: ScriptGenerationRequest,
-    db: Session = Depends(get_db)
+    script_service: ScriptService = Depends(),
+    project_service: ProjectService = Depends()
 ):
-    project = db.query(Project).filter(Project.id == project_id).first()
-    if not project:
-        raise HTTPException(status_code=404, detail="Project not found")
+    # 1. Appel au microservice Script
+    script_data = await script_service.generate(data)
     
-    # Appel au service de génération de script (OpenAI, Claude, etc.)
-    script_text = await script_service.generate(
-        title=data.title,
-        description=data.description,
-        use_case=data.use_case,
-        language=data.language,
-        style=data.style
+    # 2. Mise à jour du projet
+    project = await project_service.update(
+        project_id,
+        {
+            "script_text": script_data["text"],
+            "status": "script_generated"
+        }
     )
     
-    # Mise à jour du projet
-    project.script_text = script_text
-    project.status = "script_generated"
-    project.updated_at = datetime.utcnow()
-    db.commit()
-    
-    return {
-        "script_text": script_text,
-        "status": project.status,
-        "updated_at": project.updated_at
-    }
+    return project
+
+# services/script_service.py
+class ScriptService:
+    async def generate(self, data):
+        """Appel REST au microservice Script"""
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                f"{SCRIPT_SERVICE_URL}/api/v1/generate",
+                json=data.dict()
+            )
+            return response.json()
 ```
 
 ---
 
-### 7. POST /projects/:id/generate-audio
+## 3️⃣ DOMAINE: AUDIO
 
-**Description**: Générer l'audio à partir du script
+### POST /projects/:id/generate-audio
+
+**Description**: Générer l'audio à partir du script (appelle le microservice Audio)
 
 **Request Body**:
 ```json
@@ -299,58 +366,57 @@ async def generate_script(
 }
 ```
 
-**Implémentation avec ElevenLabs ou OpenAI TTS:**
+**Architecture Service**:
 
 ```python
+# routes/audio.py
 @router.post("/projects/{project_id}/generate-audio")
 async def generate_audio(
     project_id: str,
     data: AudioGenerationRequest,
-    db: Session = Depends(get_db)
+    audio_service: AudioService = Depends(),
+    project_service: ProjectService = Depends()
 ):
-    project = db.query(Project).filter(Project.id == project_id).first()
-    if not project:
-        raise HTTPException(status_code=404, detail="Project not found")
-    
-    # Génération audio (ElevenLabs, OpenAI TTS, etc.)
-    audio_file = await audio_service.generate(
-        text=data.script_text,
-        voice_id=data.voice_id,
-        speed=data.audio_speed,
-        language=data.language
-    )
-    
-    # Upload vers S3/Cloudinary
-    audio_url = await storage_service.upload(audio_file, f"audio/{project_id}.mp3")
+    # Appel au microservice Audio
+    audio_data = await audio_service.generate(data)
     
     # Mise à jour du projet
-    project.audio_url = audio_url
-    project.voice_id = data.voice_id
-    project.audio_speed = data.audio_speed
-    project.audio_pitch = data.audio_pitch
-    project.status = "audio_generated"
-    project.updated_at = datetime.utcnow()
-    db.commit()
+    project = await project_service.update(
+        project_id,
+        {
+            "audio_url": audio_data["url"],
+            "status": "audio_generated"
+        }
+    )
     
-    return {
-        "audio_url": audio_url,
-        "status": project.status,
-        "updated_at": project.updated_at
-    }
+    return project
+
+# services/audio_service.py
+class AudioService:
+    async def generate(self, data):
+        """Appel REST au microservice Audio"""
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                f"{AUDIO_SERVICE_URL}/api/v1/generate",
+                json=data.dict()
+            )
+            return response.json()
 ```
 
 ---
 
-### 8. POST /projects/:id/generate-images
+## 4️⃣ DOMAINE: IMAGES
 
-**Description**: Générer toutes les images pour les scènes
+### POST /projects/:id/generate-images
+
+**Description**: Générer toutes les images (appelle le microservice Image)
 
 **Request Body**:
 ```json
 {
-  "prompts": [
-    "A futuristic AI brain",
-    "Modern hospital with AI"
+  "images": [
+    {"prompt": "A futuristic AI brain", "url": null},
+    {"prompt": "Modern hospital with AI", "url": null}
   ],
   "style": "realistic"
 }
@@ -359,65 +425,70 @@ async def generate_audio(
 **Response**: `200 OK`
 ```json
 {
-  "images_urls": [
-    "https://your-storage.com/images/project-1-scene-0.png",
-    "https://your-storage.com/images/project-1-scene-1.png"
+  "images": [
+    {
+      "prompt": "A futuristic AI brain",
+      "url": "https://your-storage.com/images/project-1-scene-0.png"
+    },
+    {
+      "prompt": "Modern hospital with AI",
+      "url": "https://your-storage.com/images/project-1-scene-1.png"
+    }
   ],
   "status": "images_ready",
   "updated_at": "2025-11-29T10:15:00Z"
 }
 ```
 
-**Implémentation avec DALL-E, Stable Diffusion, etc.:**
+**Architecture Service**:
 
 ```python
+# routes/images.py
 @router.post("/projects/{project_id}/generate-images")
 async def generate_images(
     project_id: str,
     data: ImagesGenerationRequest,
-    db: Session = Depends(get_db)
+    image_service: ImageService = Depends(),
+    project_service: ProjectService = Depends()
 ):
-    project = db.query(Project).filter(Project.id == project_id).first()
-    if not project:
-        raise HTTPException(status_code=404, detail="Project not found")
-    
-    images_urls = []
-    
-    # Générer chaque image
-    for i, prompt in enumerate(data.prompts):
-        # Appel à l'API d'image (DALL-E, SD, etc.)
-        image_data = await image_service.generate(
-            prompt=f"{prompt}, {data.style} style",
-            style=data.style
-        )
-        
-        # Upload vers storage
-        image_url = await storage_service.upload(
-            image_data, 
-            f"images/{project_id}-scene-{i}.png"
-        )
-        images_urls.append(image_url)
+    # Appel au microservice Image pour chaque image
+    generated_images = await image_service.generate_batch(
+        data.images,
+        data.style
+    )
     
     # Mise à jour du projet
-    project.images_prompts = data.prompts
-    project.images_urls = images_urls
-    project.image_style = data.style
-    project.status = "images_ready"
-    project.updated_at = datetime.utcnow()
-    db.commit()
+    project = await project_service.update(
+        project_id,
+        {
+            "images": generated_images,
+            "image_style": data.style,
+            "status": "images_ready"
+        }
+    )
     
-    return {
-        "images_urls": images_urls,
-        "status": project.status,
-        "updated_at": project.updated_at
-    }
+    return project
+
+# services/image_service.py
+class ImageService:
+    async def generate_batch(self, images, style):
+        """Appel REST au microservice Image pour générer plusieurs images"""
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                f"{IMAGE_SERVICE_URL}/api/v1/generate-batch",
+                json={
+                    "images": [{"prompt": img["prompt"]} for img in images],
+                    "style": style
+                }
+            )
+            return response.json()["images"]
 ```
 
 ---
 
-### 9. POST /projects/:id/generate-images/:sceneIndex
+### POST /projects/:id/generate-images/:sceneIndex
 
-**Description**: Générer/Régénérer une seule image pour une scène spécifique
+**Description**: Générer/Régénérer une seule image (appelle le microservice Image)
 
 **Request Body**:
 ```json
@@ -435,11 +506,51 @@ async def generate_images(
 }
 ```
 
+**Architecture Service**:
+
+```python
+# routes/images.py
+@router.post("/projects/{project_id}/generate-images/{scene_index}")
+async def generate_single_image(
+    project_id: str,
+    scene_index: int,
+    data: SingleImageRequest,
+    image_service: ImageService = Depends(),
+    project_service: ProjectService = Depends()
+):
+    # Appel au microservice Image
+    image_data = await image_service.generate_single(
+        data.prompt,
+        data.style
+    )
+    
+    # Récupérer le projet et mettre à jour l'image spécifique
+    project = await project_service.get(project_id)
+    project.images[scene_index]["url"] = image_data["url"]
+    
+    await project_service.update(project_id, {"images": project.images})
+    
+    return {"image_url": image_data["url"], "scene_index": scene_index}
+
+# services/image_service.py
+class ImageService:
+    async def generate_single(self, prompt, style):
+        """Appel REST au microservice Image pour une seule image"""
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                f"{IMAGE_SERVICE_URL}/api/v1/generate",
+                json={"prompt": prompt, "style": style}
+            )
+            return response.json()
+```
+
 ---
 
-### 10. POST /projects/:id/generate-video
+## 5️⃣ DOMAINE: VIDÉO
 
-**Description**: Assembler et rendre la vidéo finale
+### POST /projects/:id/generate-video
+
+**Description**: Assembler et rendre la vidéo finale (appelle le microservice Vidéo)
 
 **Request Body**:
 ```json
@@ -462,86 +573,62 @@ async def generate_images(
 }
 ```
 
-**Implémentation avec FFmpeg ou service vidéo:**
+**Architecture Service**:
 
 ```python
+# routes/video.py
 @router.post("/projects/{project_id}/generate-video")
 async def generate_video(
     project_id: str,
     data: VideoGenerationRequest,
     background_tasks: BackgroundTasks,
-    db: Session = Depends(get_db)
+    video_service: VideoService = Depends(),
+    project_service: ProjectService = Depends()
 ):
-    project = db.query(Project).filter(Project.id == project_id).first()
-    if not project:
-        raise HTTPException(status_code=404, detail="Project not found")
+    project = await project_service.get(project_id)
     
-    # Vérifier que script, audio et images sont prêts
-    if not project.audio_url or not project.images_urls:
-        raise HTTPException(
-            status_code=400, 
-            detail="Audio and images must be generated first"
-        )
+    # Validation
+    if not project.audio_url or not project.images:
+        raise HTTPException(400, "Audio and images required")
     
-    # Lancer la génération vidéo en arrière-plan (long process)
+    # Lancer génération vidéo en arrière-plan (processus long)
     background_tasks.add_task(
-        video_service.render_video,
-        project_id=project_id,
-        audio_url=project.audio_url,
-        images_urls=project.images_urls,
-        resolution=data.resolution,
-        fps=data.fps,
-        template=data.template,
-        background_music=data.background_music
+        video_service.render,
+        project_id,
+        project,
+        data
     )
     
-    return {
-        "message": "Video generation started",
-        "status": "processing"
-    }
+    return {"message": "Video generation started", "status": "processing"}
 
-# Dans video_service.py
-async def render_video(project_id, audio_url, images_urls, resolution, fps, template, background_music):
-    # 1. Télécharger audio et images
-    # 2. Créer la vidéo avec FFmpeg
-    # 3. Ajouter transitions selon template
-    # 4. Ajouter background_music si nécessaire
-    # 5. Générer thumbnail
-    # 6. Upload vers storage
-    # 7. Mettre à jour le projet dans la DB
-    
-    video_path = f"/tmp/{project_id}.mp4"
-    
-    # Exemple FFmpeg command
-    ffmpeg_command = [
-        "ffmpeg",
-        "-framerate", str(fps),
-        "-pattern_type", "glob",
-        "-i", "images/*.png",
-        "-i", audio_url,
-        "-c:v", "libx264",
-        "-preset", "medium",
-        "-crf", "23",
-        "-c:a", "aac",
-        "-b:a", "192k",
-        "-pix_fmt", "yuv420p",
-        "-vf", f"scale={get_resolution_dimensions(resolution)}",
-        video_path
-    ]
-    
-    # Exécuter FFmpeg
-    subprocess.run(ffmpeg_command, check=True)
-    
-    # Upload
-    video_url = await storage_service.upload(video_path, f"videos/{project_id}.mp4")
-    
-    # Mettre à jour le projet
-    db = get_db_session()
-    project = db.query(Project).filter(Project.id == project_id).first()
-    project.video_url = video_url
-    project.status = "video_ready"
-    project.updated_at = datetime.utcnow()
-    db.commit()
+# services/video_service.py
+class VideoService:
+    async def render(self, project_id, project, config):
+        """Appel REST au microservice Vidéo"""
+        async with httpx.AsyncClient(timeout=300.0) as client:
+            response = await client.post(
+                f"{VIDEO_SERVICE_URL}/api/v1/render",
+                json={
+                    "audio_url": project.audio_url,
+                    "images": project.images,
+                    "resolution": config.resolution,
+                    "fps": config.fps,
+                    "template": config.template,
+                    "background_music": config.background_music
+                }
+            )
+            video_data = response.json()
+            
+            # Mise à jour du projet
+            await project_service.update(
+                project_id,
+                {
+                    "video_url": video_data["url"],
+                    "thumbnail": video_data["thumbnail"],
+                    "duration": video_data["duration"],
+                    "status": "video_ready"
+                }
+            )
 ```
 
 ---
@@ -556,10 +643,11 @@ DATABASE_URL=mongodb://localhost:27017/ai_studio
 # ou
 DATABASE_URL=postgresql://user:password@localhost/ai_studio
 
-# AI Services
-OPENAI_API_KEY=sk-...
-ELEVENLABS_API_KEY=...
-STABILITY_API_KEY=...
+# Microservices URLs
+SCRIPT_SERVICE_URL=http://script-service:8001
+AUDIO_SERVICE_URL=http://audio-service:8002
+IMAGE_SERVICE_URL=http://image-service:8003
+VIDEO_SERVICE_URL=http://video-service:8004
 
 # Storage
 AWS_ACCESS_KEY_ID=...
@@ -586,124 +674,35 @@ app.add_middleware(
 
 ---
 
-## 🧪 Testing des Endpoints
+## 📦 Microservices Recommandés
 
-### Avec cURL
+### 1. Script Service
+- **Technologie**: OpenAI GPT-4, Claude, Gemini
+- **Endpoint**: POST /api/v1/generate
+- **Responsabilité**: Génération de scripts créatifs
 
-```bash
-# Get all projects
-curl http://localhost:8001/projects
+### 2. Audio Service
+- **Technologie**: ElevenLabs, OpenAI TTS, Google Cloud TTS
+- **Endpoint**: POST /api/v1/generate
+- **Responsabilité**: Text-to-Speech
 
-# Create project
-curl -X POST http://localhost:8001/projects \
-  -H "Content-Type: application/json" \
-  -d '{"title": "Test Project", "language": "en", "use_case": "explanation"}'
+### 3. Image Service
+- **Technologie**: DALL-E 3, Stable Diffusion, Midjourney
+- **Endpoints**: 
+  - POST /api/v1/generate (single)
+  - POST /api/v1/generate-batch (multiple)
+- **Responsabilité**: Génération d'images
 
-# Generate script
-curl -X POST http://localhost:8001/projects/1/generate-script \
-  -H "Content-Type: application/json" \
-  -d '{"title": "Test", "use_case": "explanation", "style": "educational"}'
-```
-
----
-
-## 📦 Services de Génération IA Recommandés
-
-### Script Generation
-- **OpenAI GPT-4/GPT-3.5**: Excellent pour du contenu créatif
-- **Claude (Anthropic)**: Très bon pour des scripts structurés
-- **Google Gemini**: Alternative gratuite/économique
-
-**Exemple OpenAI:**
-```python
-import openai
-
-async def generate_script(title, description, use_case, style):
-    prompt = f"""
-    Create a video script for:
-    Title: {title}
-    Description: {description}
-    Use Case: {use_case}
-    Style: {style}
-    
-    Write a compelling, engaging script suitable for video narration.
-    """
-    
-    response = await openai.ChatCompletion.acreate(
-        model="gpt-4",
-        messages=[{"role": "user", "content": prompt}]
-    )
-    
-    return response.choices[0].message.content
-```
-
-### Audio Generation
-- **ElevenLabs**: Meilleure qualité vocale
-- **OpenAI TTS**: Bon rapport qualité/prix
-- **Google Cloud TTS**: Option économique
-
-**Exemple ElevenLabs:**
-```python
-import elevenlabs
-
-async def generate_audio(text, voice_id, speed):
-    audio = elevenlabs.generate(
-        text=text,
-        voice=voice_id,
-        model="eleven_monolingual_v1",
-        stability=0.5,
-        similarity_boost=0.75,
-        style=speed
-    )
-    return audio
-```
-
-### Image Generation
-- **DALL-E 3**: Haute qualité
-- **Stable Diffusion**: Open-source, personnalisable
-- **Midjourney API**: Excellent style artistique
-
-**Exemple DALL-E:**
-```python
-async def generate_image(prompt, style):
-    response = await openai.Image.acreate(
-        model="dall-e-3",
-        prompt=f"{prompt}, {style} style, high quality",
-        size="1024x1024",
-        quality="hd",
-        n=1
-    )
-    return response.data[0].url
-```
-
-### Video Assembly
-- **FFmpeg**: Assemblage local
-- **RunwayML API**: Effets avancés
-- **Pika Labs**: Génération vidéo IA
+### 4. Video Service
+- **Technologie**: FFmpeg, RunwayML, Pika Labs
+- **Endpoint**: POST /api/v1/render
+- **Responsabilité**: Assemblage vidéo, transitions, effets
 
 ---
 
 ## 🚀 Déploiement
 
-### Docker
-
-```dockerfile
-FROM python:3.11-slim
-
-WORKDIR /app
-
-# Install FFmpeg
-RUN apt-get update && apt-get install -y ffmpeg
-
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-
-COPY . .
-
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8001"]
-```
-
-### docker-compose.yml
+### Docker Compose Exemple
 
 ```yaml
 version: '3.8'
@@ -715,8 +714,16 @@ services:
       - "8001:8001"
     environment:
       - DATABASE_URL=mongodb://mongo:27017/ai_studio
+      - SCRIPT_SERVICE_URL=http://script-service:8001
+      - AUDIO_SERVICE_URL=http://audio-service:8002
+      - IMAGE_SERVICE_URL=http://image-service:8003
+      - VIDEO_SERVICE_URL=http://video-service:8004
     depends_on:
       - mongo
+      - script-service
+      - audio-service
+      - image-service
+      - video-service
   
   mongo:
     image: mongo:7
@@ -724,6 +731,26 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
+  
+  script-service:
+    image: your-org/script-service:latest
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+  
+  audio-service:
+    image: your-org/audio-service:latest
+    environment:
+      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
+  
+  image-service:
+    image: your-org/image-service:latest
+    environment:
+      - STABILITY_API_KEY=${STABILITY_API_KEY}
+  
+  video-service:
+    image: your-org/video-service:latest
+    volumes:
+      - /tmp/ffmpeg:/tmp/ffmpeg
 
 volumes:
   mongo_data:
@@ -733,30 +760,41 @@ volumes:
 
 ## ✅ Checklist d'Implémentation
 
+### Backend Core
 - [ ] Configuration base de données (MongoDB/PostgreSQL)
-- [ ] Modèle Project avec tous les champs
-- [ ] Endpoints CRUD (GET, POST, PUT, DELETE /projects)
-- [ ] Service de génération de script (OpenAI/Claude)
-- [ ] Service de génération audio (ElevenLabs/OpenAI TTS)
-- [ ] Service de génération d'images (DALL-E/SD)
-- [ ] Service d'assemblage vidéo (FFmpeg)
-- [ ] Upload vers storage (S3/Cloudinary)
+- [ ] Modèle Project avec nouveau format images
 - [ ] CORS configuré pour frontend
 - [ ] Gestion d'erreurs appropriée
 - [ ] Logging et monitoring
-- [ ] Tests unitaires et d'intégration
-- [ ] Documentation API (Swagger/OpenAPI)
+
+### Routes par Domaine
+- [ ] routes/projects.py - CRUD complet
+- [ ] routes/script.py - Génération script
+- [ ] routes/audio.py - Génération audio
+- [ ] routes/images.py - Génération images (batch + single)
+- [ ] routes/video.py - Assemblage vidéo
+
+### Services (appels REST aux microservices)
+- [ ] services/project_service.py - Gestion DB
+- [ ] services/script_service.py - Appels microservice script
+- [ ] services/audio_service.py - Appels microservice audio
+- [ ] services/image_service.py - Appels microservice image
+- [ ] services/video_service.py - Appels microservice vidéo
+
+### Tests
+- [ ] Tests unitaires des services
+- [ ] Tests d'intégration des routes
+- [ ] Tests end-to-end avec mock microservices
 
 ---
 
-## 📚 Resources Utiles
+## 📚 Ressources Utiles
 
 - [FastAPI Documentation](https://fastapi.tiangolo.com)
-- [OpenAI API](https://platform.openai.com/docs)
-- [ElevenLabs API](https://docs.elevenlabs.io)
-- [FFmpeg Documentation](https://ffmpeg.org/documentation.html)
+- [HTTPX Async Client](https://www.python-httpx.org/)
 - [MongoDB with FastAPI](https://www.mongodb.com/languages/python/pymongo-tutorial)
+- [Microservices Architecture Patterns](https://microservices.io/patterns/)
 
 ---
 
-**Bon développement ! N'hésitez pas à adapter ce guide selon vos besoins spécifiques.** 🎉
+**Bon développement ! N'oubliez pas : votre backend est un ORCHESTRATEUR, pas un processeur. Déléguez tout le traitement aux microservices !** 🎉
