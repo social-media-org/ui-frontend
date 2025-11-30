@@ -100,6 +100,55 @@ const ScriptTab = ({ project, onChange, onGenerate, loading }) => {
         />
       </div>
 
+      {/* Video Description */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Video Description
+        </label>
+        <textarea
+          value={project.video_description || ''}
+          onChange={(e) => onChange({ video_description: e.target.value })}
+          className="input-field"
+          rows={3}
+          placeholder="Enter a generated video description"
+          data-testid="video-description-input"
+        />
+      </div>
+
+      {/* Number of Sections and Keywords - Same line */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Number of Sections */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Number of Sections
+          </label>
+          <input
+            type="number"
+            value={project.nb_section || 3}
+            onChange={(e) => onChange({ nb_section: parseInt(e.target.value, 10) || 1 })}
+            className="input-field"
+            min="1"
+            placeholder="Number of sections"
+            data-testid="nb-section-input"
+          />
+        </div>
+
+        {/* Keywords */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Keywords
+          </label>
+          <input
+            type="text"
+            value={project.keywords || ''}
+            onChange={(e) => onChange({ keywords: e.target.value })}
+            className="input-field"
+            placeholder="Comma-separated keywords"
+            data-testid="keywords-input"
+          />
+        </div>
+      </div>
+
       {/* Use Case and Style - Same line */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Use Case */}

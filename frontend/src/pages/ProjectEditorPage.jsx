@@ -35,8 +35,11 @@ const ProjectEditorPage = () => {
     video_template_id: 'basic_fade',
     background_music: 'none',
     video_url: null,
+    keywords: '',
+    video_description: '',
     video_inspirations: [],
     duration: 0,
+    nb_section: 1, // Default value for number of sections
   });
 
   const [activeTab, setActiveTab] = useState('script');
@@ -114,6 +117,9 @@ const ProjectEditorPage = () => {
           use_case: project.use_case,
           language: project.language,
           style: project.script_style,
+          nb_section: project.nb_section,
+          keywords: project.keywords,
+          video_inspirations: project.video_inspirations,
         }
       );
 
