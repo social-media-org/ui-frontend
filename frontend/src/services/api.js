@@ -44,7 +44,7 @@ export const projectsAPI = {
 
   // Generate script
   generateScript: async (projectId, data) => {
-    const response = await api.post(`/scripts/${projectId}`, data);
+    const response = await api.post(`/scripts/${projectId}`, data, { timeout: 120000 });
     return response.data;
   },
 
