@@ -17,9 +17,9 @@ const ProjectEditorPage = () => {
   const isNewProject = id === 'new';
 
   const [project, setProject] = useState({
-    title: 'Untitled Project',
-    description: '',
-    language: 'en',
+    title: 'Titre du projet de creation de la video.',
+    description: 'Une description, le style, le use case et la content inspiration de la video',
+    language: 'fr',
     use_case: 'explanation',
     status: 'draft',
     script_text: '',
@@ -88,6 +88,7 @@ const ProjectEditorPage = () => {
       let savedProject;
       if (isNewProject) {
         savedProject = await projectsAPI.create(project);
+        debugger
         // Navigate to the new project's edit page
         navigate(`/projects/${savedProject.id}`, { replace: true });
       } else {
