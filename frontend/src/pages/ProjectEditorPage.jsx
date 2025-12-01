@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, Save, Loader } from 'lucide-react';
+import { ArrowLeft, Save, Loader, Sparkles } from 'lucide-react';
 import clsx from 'clsx';
 import StatusBadge from '../components/StatusBadge';
 import ScriptTab from '../components/editor/ScriptTab';
@@ -20,11 +20,10 @@ const ProjectEditorPage = () => {
     title: 'Titre du projet de creation de la video.',
     description: 'Une description, le style, le use case et la content inspiration de la video',
     language: 'fr',
-    use_case: 'explanation',
     status: 'draft',
     script_text: '',
-    script_style: 'educational',
     voice_id: 'alloy',
+    type_video: '',
     audio_speed: 1.0,
     audio_pitch: 1.0,
     audio_url: null,
@@ -46,6 +45,7 @@ const ProjectEditorPage = () => {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [generating, setGenerating] = useState({});
+  const [generatingDescription, setGeneratingDescription] = useState(false);
   const [lastSaved, setLastSaved] = useState(null);
 
   const tabs = [
@@ -79,6 +79,34 @@ const ProjectEditorPage = () => {
 
   const handleChange = (updates) => {
     setProject({ ...project, ...updates });
+  };
+
+  const handleGenerateDescription = async () => {
+    try {
+      setGeneratingDescription(true);
+      const dataToSend = {
+        title: project.title,
+        language: project.language,
+        type_video: project.type_video,
+        keywords: project.keywords,
+        video_inspirations: project.video_inspirations,
+      };
+
+      const updatedProject = await projectsAPI.generateDescription(
+        dataToSend
+      );
+
+      handleChange({
+        description: updatedProject.description,
+      });
+
+      alert('Description generated successfully!');
+    } catch (error) {
+      console.error('Error generating description:', error);
+      alert('Failed to generate description');
+    } finally {
+      setGeneratingDescription(false);
+    }
   };
 
   const handleSave = async () => {
@@ -115,9 +143,8 @@ const ProjectEditorPage = () => {
         {
           title: project.title,
           description: project.description,
-          use_case: project.use_case,
           language: project.language,
-          style: project.script_style,
+          type_video: project.type_video,
           nb_section: project.nb_section,
           keywords: project.keywords,
           video_inspirations: project.video_inspirations,
@@ -311,6 +338,7 @@ const ProjectEditorPage = () => {
               )}
             </button>
 
+
             <button
               onClick={handleGenerateVideo}
               disabled={generating.video || !project.script_text || !project.audio_url}
@@ -348,6 +376,8 @@ const ProjectEditorPage = () => {
                 onChange={handleChange}
                 onGenerate={handleGenerateScript}
                 loading={generating.script}
+                onGenerateDescription={handleGenerateDescription}
+                generatingDescription={generatingDescription}
               />
             )}
             {activeTab === 'audio' && (

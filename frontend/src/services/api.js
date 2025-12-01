@@ -44,10 +44,15 @@ export const projectsAPI = {
 
   // Generate script
   generateScript: async (projectId, data) => {
-    const response = await api.post(`/scripts/${projectId}`, data, { timeout: 120000 });
+    const response = await api.post(`/scripts/${projectId}`, data);
     return response.data;
   },
 
+  // Generate description
+  generateDescription: async (data) => {
+    const response = await api.post(`/scripts/description/generate`, data);
+    return response.data;
+  },
   // Generate audio
   generateAudio: async (projectId, data) => {
     const response = await api.post(`/audios/${projectId}`, data);
