@@ -144,22 +144,57 @@ const ScriptTab = ({ project, onChange, onGenerate, loading, onGenerateDescripti
         </button>
       </div>
 
-      {/* Type de Video */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Type de Vidéo
-        </label>
-        <select
-          value={project.type_video || ''}
-          onChange={(e) => onChange({ type_video: e.target.value })}
-          className="input-field"
-          data-testid="project-type-video-select"
-        >
-          <option value="">Aucune valeur</option>
-          <option value="LIFE_LESSON">Leçons de vie</option>
-          <option value="STOICISM">Stoïcisme</option>
-          <option value="X_THINGS_TO_DO">X choses à faire</option>
-        </select>
+      {/* Type de Video, Nombre de sections and Durée */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Type de Video */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Type de Vidéo
+          </label>
+          <select
+            value={project.type_video || ''}
+            onChange={(e) => onChange({ type_video: e.target.value })}
+            className="input-field"
+            data-testid="project-type-video-select"
+          >
+            <option value="">Aucune valeur</option>
+            <option value="LIFE_LESSON">Leçons de vie</option>
+            <option value="STOICISM">Stoïcisme</option>
+            <option value="X_THINGS_TO_DO">X choses à faire</option>
+          </select>
+        </div>
+
+        {/* Number of Sections */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Nombre de sections
+          </label>
+          <input
+            type="number"
+            value={project.nb_section || 3}
+            onChange={(e) => onChange({ nb_section: parseInt(e.target.value, 10) || 1 })}
+            className="input-field"
+            min="1"
+            placeholder="Nombre de sections"
+            data-testid="nb-section-input"
+          />
+        </div>
+
+        {/* Duration */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Durée (minutes)
+          </label>
+          <input
+            type="number"
+            value={project.duration || ''}
+            onChange={(e) => onChange({ duration: parseInt(e.target.value, 10) || '' })}
+            className="input-field"
+            min="1"
+            placeholder="Durée estimée"
+            data-testid="duration-input"
+          />
+        </div>
       </div>
 
       {/* Description */}
@@ -192,39 +227,6 @@ const ScriptTab = ({ project, onChange, onGenerate, loading, onGenerateDescripti
         />
       </div>
 
-      {/* Number of Sections and Keywords - Same line */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Number of Sections */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Number of Sections
-          </label>
-          <input
-            type="number"
-            value={project.nb_section || 3}
-            onChange={(e) => onChange({ nb_section: parseInt(e.target.value, 10) || 1 })}
-            className="input-field"
-            min="1"
-            placeholder="Number of sections"
-            data-testid="nb-section-input"
-          />
-        </div>
-
-        {/* Keywords */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Keywords
-          </label>
-          <input
-            type="text"
-            value={project.keywords || ''}
-            onChange={(e) => onChange({ keywords: e.target.value })}
-            className="input-field"
-            placeholder="Comma-separated keywords"
-            data-testid="keywords-input"
-          />
-        </div>
-      </div>
     </div>
   );
 };
