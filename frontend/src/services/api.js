@@ -50,6 +50,7 @@ export const projectsAPI = {
 
   // Generate description
   generateDescription: async (data) => {
+    // The `data` object should now include the duration field
     const response = await api.post(`/scripts/description/generate`, data);
     return response.data;
   },

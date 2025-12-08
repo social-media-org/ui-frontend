@@ -90,6 +90,7 @@ const ProjectEditorPage = () => {
         type_video: project.type_video,
         keywords: project.keywords,
         video_inspirations: project.video_inspirations,
+        duration: project.duration, // Add duration here
       };
 
       const updatedProject = await projectsAPI.generateDescription(
