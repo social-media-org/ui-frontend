@@ -98,7 +98,7 @@ const ProjectEditorPage = () => {
       );
 
       handleChange({
-        description: updatedProject.description,
+        description: updatedProject.contextual_description,
       });
 
       alert('Description generated successfully!');
