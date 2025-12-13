@@ -113,13 +113,13 @@ const AudioTab = ({ project, onChange, onGenerate, loading }) => {
       </div>
 
       {/* Audio Preview */}
-      {project.audio_url && (
+      {project.audio_path && (
         <div className="bg-gray-50 rounded-lg p-4">
           <label className="block text-sm font-medium text-gray-700 mb-3">
             Audio Preview
           </label>
           <audio controls className="w-full" data-testid="audio-player">
-            <source src={project.audio_url} type="audio/mpeg" />
+            <source src={project.audio_path} type="audio/mpeg" />
             Your browser does not support the audio element.
           </audio>
         </div>

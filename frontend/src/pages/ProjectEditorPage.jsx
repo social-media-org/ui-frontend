@@ -26,7 +26,7 @@ const ProjectEditorPage = () => {
     type_video: '',
     audio_speed: 1.0,
     audio_pitch: 1.0,
-    audio_url: null,
+    audio_path: null,
     image_style: 'realistic',
     images: [], // New format: array of {prompt: string, url: string}
     resolution: '1080p',
@@ -183,7 +183,7 @@ const ProjectEditorPage = () => {
       );
 
       handleChange({
-        audio_url: updatedProject.audio_url,
+        audio_path: updatedProject.audio_path,
         status: 'audio_generated',
       });
 
@@ -342,7 +342,7 @@ const ProjectEditorPage = () => {
 
             <button
               onClick={handleGenerateVideo}
-              disabled={generating.video || !project.script_text || !project.audio_url}
+              disabled={generating.video || !project.script_text || !project.audio_path}
               className="btn-primary"
               data-testid="generate-video-header-button"
             >

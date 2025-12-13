@@ -55,14 +55,14 @@ const PreviewPanel = ({ project, activeTab }) => {
       case 'audio':
         return (
           <div className="space-y-4">
-            {project.audio_url ? (
+            {project.audio_path ? (
               <div className="pt-6">
                 <div className="flex items-center gap-2 mb-4 text-primary-600">
                   <Mic className="w-5 h-5" />
                   <span className="font-medium">Audio Preview</span>
                 </div>
                 <audio controls className="w-full" data-testid="preview-audio-player">
-                  <source src={project.audio_url} type="audio/mpeg" />
+                  <source src={project.audio_path} type="audio/mpeg" />
                   Your browser does not support the audio element.
                 </audio>
                 <div className="mt-4 text-sm text-gray-600">

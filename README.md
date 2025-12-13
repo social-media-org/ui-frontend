@@ -209,7 +209,7 @@ Request Body:
 
 Response:
 {
-  "audio_url": "string (URL to generated audio file)",
+  "audio_path": "string (URL to generated audio file)",
   "status": "audio_generated",
   "updatedAt": "ISO date string"
 }
@@ -301,7 +301,7 @@ interface Project {
   voice_id: string; // alloy, echo, fable, onyx, nova, shimmer
   audio_speed: number; // 0.7 - 1.3
   audio_pitch: number; // 0.7 - 1.3
-  audio_url: string | null;
+  audio_path: string | null;
   
   // Images
   image_style: string; // realistic, pixar, anime, flat_design, watercolor, oil_painting, sketch

@@ -128,7 +128,7 @@ class ScriptService:
   "voice_id": "string (alloy, echo, fable, onyx, nova, shimmer)",
   "audio_speed": "number (0.7 - 1.3)",
   "audio_pitch": "number (0.7 - 1.3)",
-  "audio_url": "string | null",
+  "audio_path": "string | null",
   
   // Images - FORMAT IMPORTANT
   "image_style": "string (realistic, pixar, anime, flat_design, watercolor, oil_painting, sketch)",
@@ -360,7 +360,7 @@ class ScriptService:
 **Response**: `200 OK`
 ```json
 {
-  "audio_url": "https://your-storage.com/audio/project-1.mp3",
+  "audio_path": "https://your-storage.com/audio/project-1.mp3",
   "status": "audio_generated",
   "updated_at": "2025-11-29T10:10:00Z"
 }
@@ -384,7 +384,7 @@ async def generate_audio(
     project = await project_service.update(
         project_id,
         {
-            "audio_url": audio_data["url"],
+            "audio_path": audio_data["url"],
             "status": "audio_generated"
         }
     )
@@ -588,7 +588,7 @@ async def generate_video(
     project = await project_service.get(project_id)
     
     # Validation
-    if not project.audio_url or not project.images:
+    if not project.audio_path or not project.images:
         raise HTTPException(400, "Audio and images required")
     
     # Lancer génération vidéo en arrière-plan (processus long)
@@ -609,7 +609,7 @@ class VideoService:
             response = await client.post(
                 f"{VIDEO_SERVICE_URL}/api/v1/render",
                 json={
-                    "audio_url": project.audio_url,
+                    "audio_path": project.audio_path,
                     "images": project.images,
                     "resolution": config.resolution,
                     "fps": config.fps,

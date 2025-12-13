@@ -10,7 +10,7 @@ const VideoTab = ({ project, onChange, onGenerate, loading }) => {
         <h3 className="text-lg font-semibold text-gray-900">Video Configuration</h3>
         <button
           onClick={onGenerate}
-          disabled={loading || !project.script_text || !project.audio_url}
+          disabled={loading || !project.script_text || !project.audio_path}
           className="btn-primary flex items-center gap-2"
           data-testid="render-video-button"
         >
@@ -28,7 +28,7 @@ const VideoTab = ({ project, onChange, onGenerate, loading }) => {
         </button>
       </div>
 
-      {(!project.script_text || !project.audio_url) && (
+      {(!project.script_text || !project.audio_path) && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-800">
           <p>⚠️ Please generate script and audio before rendering video.</p>
         </div>
