@@ -90,4 +90,27 @@ export const youtubeThumbnailAPI = {
   },
 };
 
+// YouTube Scheduling API
+export const youtubeScheduleAPI = {
+  // Schedule video publication
+  scheduleVideo: async (projectId, scheduleData) => {
+    const response = await youtubeApi.post(`/schedule/${projectId}`, scheduleData);
+    return response.data;
+  },
+
+  // Unschedule video publication
+  unscheduleVideo: async (projectId, newPrivacyStatus = 'private') => {
+    const response = await youtubeApi.delete(`/schedule/${projectId}`, {
+      params: { new_privacy_status: newPrivacyStatus },
+    });
+    return response.data;
+  },
+
+  // Get list of scheduled videos
+  getScheduledVideos: async () => {
+    const response = await youtubeApi.get('/schedule/list');
+    return response.data;
+  },
+};
+
 export default youtubeApi;
