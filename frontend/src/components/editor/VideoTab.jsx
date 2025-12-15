@@ -101,12 +101,12 @@ const VideoTab = ({ project, onChange, onGenerate, loading }) => {
           Background Music
         </label>
         <select
-          value={project.background_music || 'none'}
+          value={project.background_music || ''}
           onChange={(e) => onChange({ background_music: e.target.value })}
           className="input-field"
           data-testid="background-music-select"
         >
-          <option value="none">None</option>
+          <option value="">None</option>
           <option value="soft">Soft</option>
           <option value="upbeat">Upbeat</option>
           <option value="cinematic">Cinematic</option>

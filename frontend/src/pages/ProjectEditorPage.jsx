@@ -32,7 +32,7 @@ const ProjectEditorPage = () => {
     resolution: '1080p',
     fps: 30,
     video_template_id: 'basic_fade',
-    background_music: 'none',
+    background_music: '',
     video_url: null,
     keywords: '',
     video_description: '',
