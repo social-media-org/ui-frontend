@@ -54,6 +54,7 @@ const ProjectEditorPage = () => {
     { id: 'audio', label: 'Audio' },
     { id: 'images', label: 'Images' },
     { id: 'video', label: 'Video' },
+    { id: 'youtube', label: 'YouTube' },
   ];
 
   // Load project if editing
