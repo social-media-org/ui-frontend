@@ -243,33 +243,83 @@ const YouTubeUploadPanel = ({ project }) => {
             </>
           ) : (
             <>
-              {/* Upload Button */}
-              <div className="p-6 border-2 border-dashed border-gray-300 rounded-lg text-center">
-                <Youtube className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  Ready to Upload
-                </h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  Your video is ready to be uploaded to YouTube
-                </p>
-                <button
-                  onClick={handleUpload}
-                  disabled={uploading}
-                  className="btn-primary flex items-center gap-2 mx-auto"
-                  data-testid="upload-to-youtube-button"
-                >
-                  {uploading ? (
-                    <>
-                      <Loader className="w-5 h-5 animate-spin" />
-                      Uploading to YouTube...
-                    </>
-                  ) : (
-                    <>
-                      <Upload className="w-5 h-5" />
-                      Upload to YouTube
-                    </>
-                  )}
-                </button>
+              {/* Upload Section - Not Yet Uploaded */}
+              <div className="space-y-4">
+                {/* Publish Mode Toggle */}
+                <div className="flex items-center gap-2 p-1 bg-gray-100 rounded-lg w-fit">
+                  <button
+                    onClick={() => setPublishMode('immediate')}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2 ${
+                      publishMode === 'immediate'
+                        ? 'bg-white text-primary-600 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                    data-testid="publish-mode-immediate"
+                  >
+                    <Zap className="w-4 h-4" />
+                    Publish Now
+                  </button>
+                  <button
+                    onClick={() => setPublishMode('scheduled')}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2 ${
+                      publishMode === 'scheduled'
+                        ? 'bg-white text-primary-600 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                    data-testid="publish-mode-scheduled"
+                  >
+                    <Clock className="w-4 h-4" />
+                    Schedule
+                  </button>
+                </div>
+
+                {/* Scheduling Form (if scheduled mode) */}
+                {publishMode === 'scheduled' && (
+                  <YouTubeScheduleForm
+                    onScheduleChange={setScheduleData}
+                    initialSchedule={scheduleData}
+                  />
+                )}
+
+                {/* Upload Button */}
+                <div className="p-6 border-2 border-dashed border-gray-300 rounded-lg bg-white">
+                  <Youtube className="w-12 h-12 text-red-500 mx-auto mb-3" />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2 text-center">
+                    {publishMode === 'immediate' ? 'Ready to Publish' : 'Ready to Schedule'}
+                  </h3>
+                  <p className="text-sm text-gray-600 mb-4 text-center">
+                    {publishMode === 'immediate'
+                      ? 'Your video will be published immediately to YouTube'
+                      : 'Your video will be uploaded privately and published at the scheduled time'}
+                  </p>
+                  <button
+                    onClick={handleUpload}
+                    disabled={uploading || scheduling || (publishMode === 'scheduled' && !scheduleData.publish_at)}
+                    className="btn-primary flex items-center gap-2 mx-auto"
+                    data-testid="upload-to-youtube-button"
+                  >
+                    {uploading || scheduling ? (
+                      <>
+                        <Loader className="w-5 h-5 animate-spin" />
+                        {scheduling ? 'Scheduling...' : 'Uploading...'}
+                      </>
+                    ) : (
+                      <>
+                        {publishMode === 'immediate' ? (
+                          <>
+                            <Upload className="w-5 h-5" />
+                            Publish to YouTube
+                          </>
+                        ) : (
+                          <>
+                            <Clock className="w-5 h-5" />
+                            Upload & Schedule
+                          </>
+                        )}
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             </>
           )}
