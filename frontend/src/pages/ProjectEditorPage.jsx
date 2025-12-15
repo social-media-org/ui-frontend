@@ -439,11 +439,12 @@ const ProjectEditorPage = () => {
                   <span>~{Math.ceil((project.script_text || '').length / 2.5)} seconds</span>
                 </div>
               </div>
-            ) : (
-              /* Preview Panel for other tabs */
-              <PreviewPanel project={project} activeTab={activeTab} />
-            )}
-          </div>
+              ) : (
+                /* Preview Panel for other tabs */
+                <PreviewPanel project={project} activeTab={activeTab} />
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
