@@ -54,6 +54,9 @@ const SettingsPage = () => {
           </div>
           <p className="text-gray-600">Customize the look and feel of the application.</p>
         </div>
+
+        {/* YouTube Integration */}
+        <YouTubeConnectionCard />
       </div>
     </div>
   );
