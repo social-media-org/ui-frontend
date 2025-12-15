@@ -1,5 +1,6 @@
 import React from 'react';
 import { Settings as SettingsIcon, User, Bell, Lock, Palette } from 'lucide-react';
+import YouTubeConnectionCard from '../components/YouTube/YouTubeConnectionCard';
 
 const SettingsPage = () => {
   return (
