@@ -35,6 +35,8 @@ const YouTubeUploadPanel = ({ project }) => {
         youtube_video_id: project.youtube_video_id,
         youtube_url: project.youtube_url,
         uploaded_at: project.youtube_uploaded_at,
+        scheduled_publish_at: project.youtube_scheduled_publish_at,
+        is_premiere: project.youtube_is_premiere,
       });
     }
   }, [project]);
