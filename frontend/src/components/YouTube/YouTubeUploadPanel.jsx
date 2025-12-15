@@ -59,7 +59,9 @@ const YouTubeUploadPanel = ({ project }) => {
       setUploading(true);
       setError(null);
 
-      const response = await youtubeVideosAPI.uploadVideo(project.id, 'public');
+      // Upload video (always as public for immediate, or private if scheduling)
+      const privacyStatus = publishMode === 'scheduled' ? 'private' : 'public';
+      const response = await youtubeVideosAPI.uploadVideo(project.id, privacyStatus);
       
       setUploadInfo({
         youtube_video_id: response.youtube_video_id,
@@ -67,11 +69,35 @@ const YouTubeUploadPanel = ({ project }) => {
         uploaded_at: response.uploaded_at,
       });
 
-      // Optionally update project thumbnail on YouTube
-      try {
-        await youtubeThumbnailAPI.updateThumbnailByProject(project.id);
-      } catch (thumbErr) {
-        console.warn('Failed to update thumbnail, but upload succeeded:', thumbErr);
+      // If scheduled mode, apply scheduling
+      if (publishMode === 'scheduled') {
+        try {
+          setScheduling(true);
+          const scheduleResponse = await youtubeScheduleAPI.scheduleVideo(project.id, scheduleData);
+          
+          setUploadInfo({
+            youtube_video_id: scheduleResponse.youtube_video_id,
+            youtube_url: response.youtube_url,
+            uploaded_at: response.uploaded_at,
+            scheduled_publish_at: scheduleResponse.scheduled_publish_at,
+            is_premiere: scheduleResponse.is_premiere,
+          });
+
+          alert('Video uploaded and scheduled successfully!');
+        } catch (schedErr) {
+          console.error('Scheduling failed:', schedErr);
+          setError('Video uploaded but scheduling failed. You can schedule it later.');
+        } finally {
+          setScheduling(false);
+        }
+      } else {
+        // Optionally update project thumbnail on YouTube for immediate uploads
+        try {
+          await youtubeThumbnailAPI.updateThumbnailByProject(project.id);
+        } catch (thumbErr) {
+          console.warn('Failed to update thumbnail, but upload succeeded:', thumbErr);
+        }
+        alert('Video uploaded successfully!');
       }
     } catch (err) {
       console.error('Error uploading to YouTube:', err);
