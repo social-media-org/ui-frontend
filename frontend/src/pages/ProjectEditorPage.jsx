@@ -8,6 +8,7 @@ import AudioTab from '../components/editor/AudioTab';
 import ImagesTab from '../components/editor/ImagesTab';
 import VideoTab from '../components/editor/VideoTab';
 import PreviewPanel from '../components/editor/PreviewPanel';
+import YouTubeUploadPanel from '../components/YouTube/YouTubeUploadPanel';
 import { projectsAPI } from '../services/api';
 import { formatTime } from '../utils/helpers';
 
