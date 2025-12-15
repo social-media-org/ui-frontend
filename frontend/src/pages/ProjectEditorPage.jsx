@@ -368,11 +368,17 @@ const ProjectEditorPage = () => {
         </div>
       </div>
 
-      {/* Content - Two Columns */}
+      {/* Content - Two Columns or Full Width for YouTube */}
       <div className="flex-1 overflow-hidden">
         <div className="h-full flex">
-          {/* Left Column - Form */}
-          <div className="w-1/2 overflow-y-auto p-8 border-r border-gray-200" data-testid="form-column">
+          {/* Left Column - Form (Full width for YouTube tab) */}
+          <div 
+            className={clsx(
+              'overflow-y-auto p-8',
+              activeTab === 'youtube' ? 'w-full' : 'w-1/2 border-r border-gray-200'
+            )} 
+            data-testid="form-column"
+          >
             {activeTab === 'script' && (
               <ScriptTab
                 project={project}
