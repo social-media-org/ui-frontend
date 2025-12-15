@@ -408,6 +408,9 @@ const ProjectEditorPage = () => {
                 loading={generating.video}
               />
             )}
+            {activeTab === 'youtube' && (
+              <YouTubeUploadPanel project={project} />
+            )}
           </div>
 
           {/* Right Column - Preview or Script Content */}
