@@ -1,17 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { Youtube, Upload, Loader, AlertCircle, XCircle, Settings } from 'lucide-react';
-import { youtubeAuthAPI, youtubeVideosAPI, youtubeThumbnailAPI } from '../../services/youtube.api';
+import { Youtube, Upload, Loader, AlertCircle, XCircle, Settings, Clock, Zap } from 'lucide-react';
+import { youtubeAuthAPI, youtubeVideosAPI, youtubeThumbnailAPI, youtubeScheduleAPI } from '../../services/youtube.api';
 import YouTubeUploadStatus from './YouTubeUploadStatus';
 import YouTubeMetadataForm from './YouTubeMetadataForm';
+import YouTubeScheduleForm from './YouTubeScheduleForm';
 
 const YouTubeUploadPanel = ({ project }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [scheduling, setScheduling] = useState(false);
   const [updatingThumbnail, setUpdatingThumbnail] = useState(false);
   const [error, setError] = useState(null);
   const [uploadInfo, setUploadInfo] = useState(null);
   const [showMetadataForm, setShowMetadataForm] = useState(false);
+  
+  // Scheduling states
+  const [publishMode, setPublishMode] = useState('immediate'); // 'immediate' or 'scheduled'
+  const [scheduleData, setScheduleData] = useState({
+    publish_at: '',
+    is_premiere: false,
+    final_privacy_status: 'public',
+  });
 
   // Check authentication status
   useEffect(() => {
