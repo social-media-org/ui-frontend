@@ -53,6 +53,16 @@ export const getStatusConfig = (status) => {
       color: 'bg-green-100 text-green-700',
       dotColor: 'bg-green-500',
     },
+    scheduled_for_publish: {
+      label: 'Scheduled for Publish',
+      color: 'bg-orange-100 text-orange-700',
+      dotColor: 'bg-orange-500',
+    },
+    uploaded_to_youtube: {
+      label: 'Uploaded to YouTube',
+      color: 'bg-teal-100 text-teal-700',
+      dotColor: 'bg-teal-500',
+    },
   };
   return configs[status] || configs.draft;
 };

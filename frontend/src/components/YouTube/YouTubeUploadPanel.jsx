@@ -125,7 +125,7 @@ const YouTubeUploadPanel = ({ project }) => {
   };
 
   // Check if project is ready for upload
-  const isVideoReady = project?.status === 'video_ready' && project?.video_url;
+  const isVideoReady = (project?.status === 'video_ready' || project?.status ===  'scheduled_for_publish') && project?.video_url;
   const isAlreadyUploaded = !!uploadInfo?.youtube_video_id;
 
   if (checkingAuth) {
