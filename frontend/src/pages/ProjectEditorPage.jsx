@@ -419,10 +419,11 @@ const ProjectEditorPage = () => {
             )}
           </div>
 
-          {/* Right Column - Preview or Script Content */}
-          <div className="w-1/2 overflow-y-auto p-8 pt-6 bg-gray-50" data-testid="preview-column">
-            {activeTab === 'script' ? (
-              /* Script Content */
+          {/* Right Column - Preview or Script Content (Hidden for YouTube tab) */}
+          {activeTab !== 'youtube' && (
+            <div className="w-1/2 overflow-y-auto p-8 pt-6 bg-gray-50" data-testid="preview-column">
+              {activeTab === 'script' ? (
+                /* Script Content */
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-gray-900">Script Content</h3>
                 <textarea
