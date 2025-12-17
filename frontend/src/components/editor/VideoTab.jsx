@@ -7,8 +7,14 @@ const VideoTab = ({ project, onChange, onGenerate, loading }) => {
   const [templates, setTemplates] = useState([]);
   const [loadingTemplates, setLoadingTemplates] = useState(false);
   const [addingSubtitles, setAddingSubtitles] = useState(false);
+  const [subtitleStyles, setSubtitleStyles] = useState([]);
+  const [subtitlePositions, setSubtitlePositions] = useState([]);
+  const [loadingStyles, setLoadingStyles] = useState(false);
+  const [loadingPositions, setLoadingPositions] = useState(false);
+  const [selectedStyle, setSelectedStyle] = useState('classic');
+  const [selectedPosition, setSelectedPosition] = useState('bottom');
   
-  // Load video templates on component mount
+  // Load video templates, subtitle styles and positions on component mount
   useEffect(() => {
     const loadTemplates = async () => {
       try {
@@ -21,8 +27,34 @@ const VideoTab = ({ project, onChange, onGenerate, loading }) => {
         setLoadingTemplates(false);
       }
     };
+
+    const loadSubtitleStyles = async () => {
+      try {
+        setLoadingStyles(true);
+        const response = await projectsAPI.getSubtitleStyles();
+        setSubtitleStyles(response.styles || []);
+      } catch (error) {
+        console.error('Error loading subtitle styles:', error);
+      } finally {
+        setLoadingStyles(false);
+      }
+    };
+
+    const loadSubtitlePositions = async () => {
+      try {
+        setLoadingPositions(true);
+        const response = await projectsAPI.getSubtitlePositions();
+        setSubtitlePositions(response.positions || []);
+      } catch (error) {
+        console.error('Error loading subtitle positions:', error);
+      } finally {
+        setLoadingPositions(false);
+      }
+    };
     
     loadTemplates();
+    loadSubtitleStyles();
+    loadSubtitlePositions();
   }, []);
 
   const handleAddSubtitles = async () => {
@@ -34,7 +66,8 @@ const VideoTab = ({ project, onChange, onGenerate, loading }) => {
     try {
       setAddingSubtitles(true);
       const data = {
-        style_name: 'classic',
+        style_name: selectedStyle,
+        position_name: selectedPosition,
         async_processing: false,
       };
       const updatedProject = await projectsAPI.addSubtitlesToVideo(project.id, data);
@@ -206,6 +239,66 @@ const VideoTab = ({ project, onChange, onGenerate, loading }) => {
           <option value="corporate">Corporate</option>
           <option value="ambient">Ambient</option>
         </select>
+      </div>
+
+      {/* Subtitle Style */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Subtitle Style
+        </label>
+        {loadingStyles ? (
+          <div className="input-field flex items-center gap-2">
+            <Loader className="w-4 h-4 animate-spin" />
+            Loading styles...
+          </div>
+        ) : subtitleStyles.length === 0 ? (
+          <div className="input-field text-gray-500">
+            No subtitle styles available
+          </div>
+        ) : (
+          <select
+            value={selectedStyle}
+            onChange={(e) => setSelectedStyle(e.target.value)}
+            className="input-field"
+            data-testid="subtitle-style-select"
+          >
+            {subtitleStyles.map((style) => (
+              <option key={style.name} value={style.name}>
+                {style.name} - {style.description}
+              </option>
+            ))}
+          </select>
+        )}
+      </div>
+
+      {/* Subtitle Position */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Subtitle Position
+        </label>
+        {loadingPositions ? (
+          <div className="input-field flex items-center gap-2">
+            <Loader className="w-4 h-4 animate-spin" />
+            Loading positions...
+          </div>
+        ) : subtitlePositions.length === 0 ? (
+          <div className="input-field text-gray-500">
+            No subtitle positions available
+          </div>
+        ) : (
+          <select
+            value={selectedPosition}
+            onChange={(e) => setSelectedPosition(e.target.value)}
+            className="input-field"
+            data-testid="subtitle-position-select"
+          >
+            {subtitlePositions.map((position) => (
+              <option key={position.name} value={position.name}>
+                {position.name} - {position.description}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       {/* Video Preview */}

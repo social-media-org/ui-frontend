@@ -95,6 +95,18 @@ export const projectsAPI = {
     return response.data;
   },
 
+  // Get subtitle styles
+  getSubtitleStyles: async () => {
+    const response = await api.get('/subtitles/styles');
+    return response.data;
+  },
+
+  // Get subtitle positions
+  getSubtitlePositions: async () => {
+    const response = await api.get('/subtitles/positions');
+    return response.data;
+  },
+
   // Get video templates
   getVideoTemplates: async () => {
     const response = await api.get('/video-template');
