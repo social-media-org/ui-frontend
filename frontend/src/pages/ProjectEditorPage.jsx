@@ -203,6 +203,37 @@ const ProjectEditorPage = () => {
     }
   };
 
+  const handleTranscribeAudio = async () => {
+    if (!project.audio_path) {
+      alert('No audio file available. Please generate audio first.');
+      return;
+    }
+
+    try {
+      setGenerating({ ...generating, transcription: true });
+
+      const result = await projectsAPI.transcribeAudio(
+        isNewProject ? 'temp' : id,
+        project.audio_path
+      );
+
+      if (result.success) {
+        // Update project with transcription path
+        handleChange({
+          transcription_path: result.transcription_path,
+        });
+        alert('Transcription generated successfully!');
+      } else {
+        alert('Transcription failed. Please check the audio file.');
+      }
+    } catch (error) {
+      console.error('Error transcribing audio:', error);
+      alert('Failed to transcribe audio');
+    } finally {
+      setGenerating({ ...generating, transcription: false });
+    }
+  };
+
   const handleGenerateImages = async () => {
     try {
       setGenerating({ ...generating, images: true });
@@ -399,7 +430,9 @@ const ProjectEditorPage = () => {
                 project={project}
                 onChange={handleChange}
                 onGenerate={handleGenerateAudio}
+                onTranscribe={handleTranscribeAudio}
                 loading={generating.audio}
+                transcribing={generating.transcription}
               />
             )}
             {activeTab === 'images' && (

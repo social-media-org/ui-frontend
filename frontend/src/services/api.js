@@ -60,6 +60,15 @@ export const projectsAPI = {
     return response.data;
   },
 
+  // Transcribe audio
+  transcribeAudio: async (projectId, audioPath) => {
+    const response = await api.post('/audios/transcribe', {
+      project_id: projectId,
+      audio_path: audioPath,
+    });
+    return response.data;
+  },
+
   // Generate images
   generateImages: async (projectId, data) => {
     const response = await api.post(`/images/${projectId}`, data);

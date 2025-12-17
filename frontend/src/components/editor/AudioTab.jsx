@@ -1,7 +1,7 @@
 import React from 'react';
-import { Mic, Loader, Volume2 } from 'lucide-react';
+import { Mic, Loader, Volume2, FileText } from 'lucide-react';
 
-const AudioTab = ({ project, onChange, onGenerate, loading }) => {
+const AudioTab = ({ project, onChange, onGenerate, onTranscribe, loading, transcribing }) => {
   const voices = [
     { id: 'alloy', label: 'Alloy', description: 'Neutral' },
     { id: 'echo', label: 'Echo', description: 'Male, clear' },
@@ -15,24 +15,44 @@ const AudioTab = ({ project, onChange, onGenerate, loading }) => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-gray-900">Audio Settings</h3>
-        <button
-          onClick={onGenerate}
-          disabled={loading || !project.script_text}
-          className="btn-primary flex items-center gap-2"
-          data-testid="generate-audio-button"
-        >
-          {loading ? (
-            <>
-              <Loader className="w-4 h-4 animate-spin" />
-              Generating...
-            </>
-          ) : (
-            <>
-              <Mic className="w-4 h-4" />
-              Generate Audio
-            </>
-          )}
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={onGenerate}
+            disabled={loading || !project.script_text}
+            className="btn-primary flex items-center gap-2"
+            data-testid="generate-audio-button"
+          >
+            {loading ? (
+              <>
+                <Loader className="w-4 h-4 animate-spin" />
+                Generating...
+              </>
+            ) : (
+              <>
+                <Mic className="w-4 h-4" />
+                Generate Audio
+              </>
+            )}
+          </button>
+          <button
+            onClick={onTranscribe}
+            disabled={transcribing || !project.audio_path}
+            className="btn-secondary flex items-center gap-2"
+            data-testid="transcribe-audio-button"
+          >
+            {transcribing ? (
+              <>
+                <Loader className="w-4 h-4 animate-spin" />
+                Transcribing...
+              </>
+            ) : (
+              <>
+                <FileText className="w-4 h-4" />
+                Transcribe Audio
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       {!project.script_text && (
@@ -122,6 +142,18 @@ const AudioTab = ({ project, onChange, onGenerate, loading }) => {
             <source src={project.audio_path} type="audio/mpeg" />
             Your browser does not support the audio element.
           </audio>
+        </div>
+      )}
+
+      {/* Transcription Info */}
+      {project.transcription_path && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <label className="block text-sm font-medium text-green-700 mb-2">
+            Transcription Available
+          </label>
+          <p className="text-sm text-green-600">
+            Transcription file: {project.transcription_path}
+          </p>
         </div>
       )}
     </div>
