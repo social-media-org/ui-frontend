@@ -62,9 +62,11 @@ export const projectsAPI = {
 
   // Generate subtitle
   generateSubtitle: async (projectId, audioPath) => {
-    const response = await api.post('/audios/generate-subtitle', {
-      project_id: projectId,
-      audio_path: audioPath,
+    const response = await api.get('/audios/generate-subtitle', {
+      params: {
+        project_id: projectId,
+        audio_path: audioPath,
+      }
     });
     return response.data;
   },
