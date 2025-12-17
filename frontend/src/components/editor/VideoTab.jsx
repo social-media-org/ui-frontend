@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Video, Loader, Play } from 'lucide-react';
+import { Video, Loader, Play, Subtitles } from 'lucide-react';
 import { projectsAPI } from '../../services/api';
 
 const VideoTab = ({ project, onChange, onGenerate, loading }) => {
   const fpsOptions = [24, 30, 60];
   const [templates, setTemplates] = useState([]);
   const [loadingTemplates, setLoadingTemplates] = useState(false);
+  const [addingSubtitles, setAddingSubtitles] = useState(false);
   
   // Load video templates on component mount
   useEffect(() => {
@@ -24,33 +25,89 @@ const VideoTab = ({ project, onChange, onGenerate, loading }) => {
     loadTemplates();
   }, []);
 
+  const handleAddSubtitles = async () => {
+    if (!project.video_url || !project.subtitle_path) {
+      alert('Video and subtitles are required to add subtitles to video');
+      return;
+    }
+    
+    try {
+      setAddingSubtitles(true);
+      const data = {
+        style_name: 'classic',
+        async_processing: false,
+      };
+      const updatedProject = await projectsAPI.addSubtitlesToVideo(project.id, data);
+      // Notify parent component about the update
+      onChange(updatedProject);
+      alert('Subtitles added successfully!');
+    } catch (error) {
+      console.error('Error adding subtitles:', error);
+      alert('Failed to add subtitles: ' + (error.response?.data?.detail || error.message));
+    } finally {
+      setAddingSubtitles(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-gray-900">Video Configuration</h3>
-        <button
-          onClick={onGenerate}
-          disabled={loading || !project.script_text || !project.audio_path}
-          className="btn-primary flex items-center gap-2"
-          data-testid="render-video-button"
-        >
-          {loading ? (
-            <>
-              <Loader className="w-4 h-4 animate-spin" />
-              Rendering...
-            </>
-          ) : (
-            <>
-              <Video className="w-4 h-4" />
-              Render Video
-            </>
-          )}
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={onGenerate}
+            disabled={loading || !project.script_text || !project.audio_path}
+            className="btn-primary flex items-center gap-2"
+            data-testid="render-video-button"
+          >
+            {loading ? (
+              <>
+                <Loader className="w-4 h-4 animate-spin" />
+                Rendering...
+              </>
+            ) : (
+              <>
+                <Video className="w-4 h-4" />
+                Render Video
+              </>
+            )}
+          </button>
+          <button
+            onClick={handleAddSubtitles}
+            disabled={addingSubtitles || !project.video_url || !project.subtitle_path}
+            className="btn-secondary flex items-center gap-2"
+            data-testid="add-subtitles-button"
+          >
+            {addingSubtitles ? (
+              <>
+                <Loader className="w-4 h-4 animate-spin" />
+                Adding Subtitles...
+              </>
+            ) : (
+              <>
+                <Subtitles className="w-4 h-4" />
+                Add Subtitles
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       {(!project.script_text || !project.audio_path) && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-800">
           <p>⚠️ Please generate script and audio before rendering video.</p>
+        </div>
+      )}
+
+      {project.video_url && !project.subtitle_path && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-800">
+          <p>ℹ️ Video rendered but no subtitles available. Generate subtitles from Audio tab first.</p>
+        </div>
+      )}
+
+      {project.video_url && project.subtitle_path && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-sm text-green-800">
+          <p>✅ Video and subtitles ready. Click "Add Subtitles" to render subtitles on video.</p>
         </div>
       )}
 

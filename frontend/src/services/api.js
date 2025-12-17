@@ -89,6 +89,12 @@ export const projectsAPI = {
     return response.data;
   },
 
+  // Add subtitles to video
+  addSubtitlesToVideo: async (projectId, data) => {
+    const response = await api.post(`/subtitles/${projectId}`, data);
+    return response.data;
+  },
+
   // Get video templates
   getVideoTemplates: async () => {
     const response = await api.get('/video-template');
