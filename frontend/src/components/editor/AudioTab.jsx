@@ -1,7 +1,7 @@
 import React from 'react';
 import { Mic, Loader, Volume2, FileText } from 'lucide-react';
 
-const AudioTab = ({ project, onChange, onGenerate, onTranscribe, loading, transcribing }) => {
+const AudioTab = ({ project, onChange, onGenerate, onGenerateSubtitle, loading, generatingSubtitle }) => {
   const voices = [
     { id: 'alloy', label: 'Alloy', description: 'Neutral' },
     { id: 'echo', label: 'Echo', description: 'Male, clear' },
@@ -35,20 +35,20 @@ const AudioTab = ({ project, onChange, onGenerate, onTranscribe, loading, transc
             )}
           </button>
           <button
-            onClick={onTranscribe}
-            disabled={transcribing || !project.audio_path}
+            onClick={onGenerateSubtitle}
+            disabled={generatingSubtitle || !project.audio_path}
             className="btn-secondary flex items-center gap-2"
-            data-testid="transcribe-audio-button"
+            data-testid="generate-subtitle-button"
           >
-            {transcribing ? (
+            {generatingSubtitle ? (
               <>
                 <Loader className="w-4 h-4 animate-spin" />
-                Transcribing...
+                Generating...
               </>
             ) : (
               <>
                 <FileText className="w-4 h-4" />
-                Transcribe Audio
+                Generate Subtitle
               </>
             )}
           </button>
@@ -145,14 +145,14 @@ const AudioTab = ({ project, onChange, onGenerate, onTranscribe, loading, transc
         </div>
       )}
 
-      {/* Transcription Info */}
-      {project.transcription_path && (
+      {/* Subtitle Info */}
+      {project.subtitle_path && (
         <div className="bg-green-50 border border-green-200 rounded-lg p-4">
           <label className="block text-sm font-medium text-green-700 mb-2">
-            Transcription Available
+            Subtitle Available
           </label>
           <p className="text-sm text-green-600">
-            Transcription file: {project.transcription_path}
+            Subtitle file: {project.subtitle_path}
           </p>
         </div>
       )}

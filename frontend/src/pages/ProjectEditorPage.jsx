@@ -28,6 +28,7 @@ const ProjectEditorPage = () => {
     audio_speed: 1.0,
     audio_pitch: 1.0,
     audio_path: null,
+    subtitle_path: null,
     image_style: 'realistic',
     images: [], // New format: array of {prompt: string, url: string}
     resolution: '1080p',
@@ -203,34 +204,34 @@ const ProjectEditorPage = () => {
     }
   };
 
-  const handleTranscribeAudio = async () => {
+  const handleGenerateSubtitle = async () => {
     if (!project.audio_path) {
       alert('No audio file available. Please generate audio first.');
       return;
     }
 
     try {
-      setGenerating({ ...generating, transcription: true });
+      setGenerating({ ...generating, subtitle: true });
 
-      const result = await projectsAPI.transcribeAudio(
+      const result = await projectsAPI.generateSubtitle(
         isNewProject ? 'temp' : id,
         project.audio_path
       );
 
       if (result.success) {
-        // Update project with transcription path
+        // Update project with subtitle path
         handleChange({
-          transcription_path: result.transcription_path,
+          subtitle_path: result.subtitle_path,
         });
-        alert('Transcription generated successfully!');
+        alert('Subtitle generated successfully!');
       } else {
-        alert('Transcription failed. Please check the audio file.');
+        alert('Subtitle generation failed. Please check the audio file.');
       }
     } catch (error) {
-      console.error('Error transcribing audio:', error);
-      alert('Failed to transcribe audio');
+      console.error('Error generating subtitle:', error);
+      alert('Failed to generate subtitle');
     } finally {
-      setGenerating({ ...generating, transcription: false });
+      setGenerating({ ...generating, subtitle: false });
     }
   };
 
@@ -430,9 +431,9 @@ const ProjectEditorPage = () => {
                 project={project}
                 onChange={handleChange}
                 onGenerate={handleGenerateAudio}
-                onTranscribe={handleTranscribeAudio}
+                onGenerateSubtitle={handleGenerateSubtitle}
                 loading={generating.audio}
-                transcribing={generating.transcription}
+                generatingSubtitle={generating.subtitle}
               />
             )}
             {activeTab === 'images' && (

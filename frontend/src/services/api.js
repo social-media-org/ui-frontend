@@ -60,9 +60,9 @@ export const projectsAPI = {
     return response.data;
   },
 
-  // Transcribe audio
-  transcribeAudio: async (projectId, audioPath) => {
-    const response = await api.post('/audios/transcribe', {
+  // Generate subtitle
+  generateSubtitle: async (projectId, audioPath) => {
+    const response = await api.post('/audios/generate-subtitle', {
       project_id: projectId,
       audio_path: audioPath,
     });
