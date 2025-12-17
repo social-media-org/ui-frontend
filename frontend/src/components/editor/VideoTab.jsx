@@ -1,8 +1,28 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Video, Loader, Play } from 'lucide-react';
+import { projectsAPI } from '../../services/api';
 
 const VideoTab = ({ project, onChange, onGenerate, loading }) => {
   const fpsOptions = [24, 30, 60];
+  const [templates, setTemplates] = useState([]);
+  const [loadingTemplates, setLoadingTemplates] = useState(false);
+  
+  // Load video templates on component mount
+  useEffect(() => {
+    const loadTemplates = async () => {
+      try {
+        setLoadingTemplates(true);
+        const response = await projectsAPI.getVideoTemplates();
+        setTemplates(response.templates || []);
+      } catch (error) {
+        console.error('Error loading video templates:', error);
+      } finally {
+        setLoadingTemplates(false);
+      }
+    };
+    
+    loadTemplates();
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -78,21 +98,37 @@ const VideoTab = ({ project, onChange, onGenerate, loading }) => {
       {/* Motion Template */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Motion Template
+          Video Template
         </label>
-        <select
-          value={project.video_template_id || 'basic_fade'}
-          onChange={(e) => onChange({ video_template_id: e.target.value })}
-          className="input-field"
-          data-testid="video-template-select"
-        >
-          <option value="basic_fade">Basic Fade</option>
-          <option value="slide_left">Slide Left</option>
-          <option value="slide_right">Slide Right</option>
-          <option value="zoom_in">Zoom In</option>
-          <option value="zoom_out">Zoom Out</option>
-          <option value="ken_burns">Ken Burns Effect</option>
-        </select>
+        {loadingTemplates ? (
+          <div className="input-field flex items-center gap-2">
+            <Loader className="w-4 h-4 animate-spin" />
+            Loading templates...
+          </div>
+        ) : templates.length === 0 ? (
+          <div className="input-field text-gray-500">
+            No video templates available
+          </div>
+        ) : (
+          <select
+            value={project.video_template_path || ''}
+            onChange={(e) => onChange({ video_template_path: e.target.value })}
+            className="input-field"
+            data-testid="video-template-select"
+          >
+            <option value="">Select a video template...</option>
+            {templates.map((template) => (
+              <option key={template.absolute_path} value={template.absolute_path}>
+                {template.label}
+              </option>
+            ))}
+          </select>
+        )}
+        {project.video_template_path && (
+          <p className="text-xs text-gray-500 mt-1">
+            Selected: {project.video_template_path}
+          </p>
+        )}
       </div>
 
       {/* Background Music */}

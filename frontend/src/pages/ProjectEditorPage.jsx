@@ -32,7 +32,7 @@ const ProjectEditorPage = () => {
     images: [], // New format: array of {prompt: string, url: string}
     resolution: '1080p',
     fps: 30,
-    video_template_id: 'basic_fade',
+    video_template_path: '',
     background_music: '',
     video_url: null,
     keywords: '',
@@ -68,7 +68,12 @@ const ProjectEditorPage = () => {
     try {
       setLoading(true);
       const data = await projectsAPI.getById(id);
-      setProject(data);
+      // Map video_template_id to video_template_path for backward compatibility
+      const projectData = {
+        ...data,
+        video_template_path: data.video_template_path || data.video_template_id || '',
+      };
+      setProject(projectData);
       setLastSaved(data.updatedAt);
     } catch (error) {
       console.error('Error fetching project:', error);
@@ -264,7 +269,7 @@ const ProjectEditorPage = () => {
         {
           resolution: project.resolution,
           fps: project.fps,
-          template: project.video_template_id,
+        template: project.video_template_path,
           background_music: project.background_music,
         }
       );

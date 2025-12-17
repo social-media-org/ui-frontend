@@ -77,6 +77,12 @@ export const projectsAPI = {
     const response = await api.post(`/video/${projectId}`, data);
     return response.data;
   },
+
+  // Get video templates
+  getVideoTemplates: async () => {
+    const response = await api.get('/video-template');
+    return response.data;
+  },
 };
 
 export default api;
