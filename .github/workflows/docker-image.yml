@@ -44,5 +44,5 @@ jobs:
           file: ./frontend/Dockerfile
           push: true
           tags: |
-            ghcr.io/social-media/ui-frontend:${{ github.event.inputs.tag || 'latest' }}
-            ghcr.io/social-media/ui-frontend:${{ github.sha }}
+            ghcr.io/social-media-org/ui-frontend:${{ github.event.inputs.tag || 'latest' }}
+            ghcr.io/social-media-org/ui-frontend:${{ github.sha }}
