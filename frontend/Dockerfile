@@ -12,8 +12,8 @@ WORKDIR /app
 COPY package*.json ./
 COPY yarn.lock ./
 
-# Install dependencies
-RUN npm ci --only=production
+# Install dependencies (including dev dependencies for build tools)
+RUN npm ci
 
 # Copy application code
 COPY . .
