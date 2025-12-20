@@ -326,7 +326,13 @@ const VideoTab = ({ project, onChange, onGenerate, loading }) => {
           
           {/* Video Player */}
           <div className="aspect-video bg-gray-900 rounded-lg overflow-hidden max-w-2xl mx-auto">
-            <video controls className="w-full h-full" data-testid="video-preview-player">
+            <video 
+              key={project.video_url} 
+              controls 
+              className="w-full h-full" 
+              data-testid="video-preview-player"
+              preload="metadata"
+            >
               <source src={project.video_url} type="video/mp4" />
               Your browser does not support the video tag.
             </video>

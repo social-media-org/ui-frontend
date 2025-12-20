@@ -141,7 +141,13 @@ const AudioTab = ({ project, onChange, onGenerate, onGenerateSubtitle, loading, 
           
           {/* Audio Player */}
           <div className="bg-white rounded-lg p-4">
-            <audio controls className="w-full" data-testid="audio-player">
+            <audio 
+              key={project.audio_url || project.audio_path}
+              controls 
+              className="w-full" 
+              data-testid="audio-player"
+              preload="metadata"
+            >
               <source src={project.audio_url || project.audio_path} type="audio/mpeg" />
               <source src={project.audio_url || project.audio_path} type="audio/mp3" />
               Your browser does not support the audio element.
