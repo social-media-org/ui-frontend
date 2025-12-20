@@ -11,7 +11,7 @@ const VideoTab = ({ project, onChange, onGenerate, loading }) => {
   const [subtitlePositions, setSubtitlePositions] = useState([]);
   const [loadingStyles, setLoadingStyles] = useState(false);
   const [loadingPositions, setLoadingPositions] = useState(false);
-  const [selectedStyle, setSelectedStyle] = useState('classic');
+  const [selectedStyle, setSelectedStyle] = useState('tiktok_highlight');
   const [selectedPosition, setSelectedPosition] = useState('bottom');
   
   // Load video templates, subtitle styles and positions on component mount
