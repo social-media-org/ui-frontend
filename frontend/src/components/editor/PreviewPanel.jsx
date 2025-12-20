@@ -126,7 +126,7 @@ const PreviewPanel = ({ project, activeTab }) => {
                   <span className="font-medium">Video Preview</span>
                 </div>
                 <div className="aspect-video bg-gray-900 rounded-lg overflow-hidden">
-                  <video controls className="w-full h-full">
+                  <video controls className="w-full h-full" key={project.video_url} >
                     <source src={project.video_url} type="video/mp4" />
                     Your browser does not support the video tag.
                   </video>

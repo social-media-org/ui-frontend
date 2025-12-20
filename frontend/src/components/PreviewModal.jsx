@@ -26,6 +26,7 @@ const PreviewModal = ({ isOpen, onClose, videoUrl, title }) => {
               controls
               className="w-full rounded-lg"
               data-testid="video-player"
+              key={project.video_url}
             >
               <source src={videoUrl} type="video/mp4" />
               Your browser does not support the video tag.
