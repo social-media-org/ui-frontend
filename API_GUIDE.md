@@ -332,7 +332,7 @@ class ScriptService:
         """Appel REST au microservice Script"""
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"{SCRIPT_SERVICE_URL}/api/v1/generate",
+                f"{SCRIPT_SERVICE_URL}/generate",
                 json=data.dict()
             )
             return response.json()
@@ -397,7 +397,7 @@ class AudioService:
         """Appel REST au microservice Audio"""
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"{AUDIO_SERVICE_URL}/api/v1/generate",
+                f"{AUDIO_SERVICE_URL}/generate",
                 json=data.dict()
             )
             return response.json()
@@ -475,7 +475,7 @@ class ImageService:
         """Appel REST au microservice Image pour générer plusieurs images"""
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"{IMAGE_SERVICE_URL}/api/v1/generate-batch",
+                f"{IMAGE_SERVICE_URL}/generate-batch",
                 json={
                     "images": [{"prompt": img["prompt"]} for img in images],
                     "style": style
@@ -538,7 +538,7 @@ class ImageService:
         """Appel REST au microservice Image pour une seule image"""
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"{IMAGE_SERVICE_URL}/api/v1/generate",
+                f"{IMAGE_SERVICE_URL}/generate",
                 json={"prompt": prompt, "style": style}
             )
             return response.json()
@@ -607,7 +607,7 @@ class VideoService:
         """Appel REST au microservice Vidéo"""
         async with httpx.AsyncClient(timeout=300.0) as client:
             response = await client.post(
-                f"{VIDEO_SERVICE_URL}/api/v1/render",
+                f"{VIDEO_SERVICE_URL}/render",
                 json={
                     "audio_path": project.audio_path,
                     "images": project.images,
@@ -677,24 +677,24 @@ app.add_middleware(
 
 ### 1. Script Service
 - **Technologie**: OpenAI GPT-4, Claude, Gemini
-- **Endpoint**: POST /api/v1/generate
+- **Endpoint**: POST /generate
 - **Responsabilité**: Génération de scripts créatifs
 
 ### 2. Audio Service
 - **Technologie**: ElevenLabs, OpenAI TTS, Google Cloud TTS
-- **Endpoint**: POST /api/v1/generate
+- **Endpoint**: POST /generate
 - **Responsabilité**: Text-to-Speech
 
 ### 3. Image Service
 - **Technologie**: DALL-E 3, Stable Diffusion, Midjourney
 - **Endpoints**: 
-  - POST /api/v1/generate (single)
-  - POST /api/v1/generate-batch (multiple)
+  - POST /generate (single)
+  - POST /generate-batch (multiple)
 - **Responsabilité**: Génération d'images
 
 ### 4. Video Service
 - **Technologie**: FFmpeg, RunwayML, Pika Labs
-- **Endpoint**: POST /api/v1/render
+- **Endpoint**: POST /render
 - **Responsabilité**: Assemblage vidéo, transitions, effets
 
 ---
