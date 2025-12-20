@@ -7,7 +7,6 @@ import ScriptTab from '../components/editor/ScriptTab';
 import AudioTab from '../components/editor/AudioTab';
 import ImagesTab from '../components/editor/ImagesTab';
 import VideoTab from '../components/editor/VideoTab';
-import PreviewPanel from '../components/editor/PreviewPanel';
 import YouTubeUploadPanel from '../components/YouTube/YouTubeUploadPanel';
 import { projectsAPI } from '../services/api';
 import { formatTime } from '../utils/helpers';
@@ -405,27 +404,41 @@ const ProjectEditorPage = () => {
         </div>
       </div>
 
-      {/* Content - Two Columns or Full Width for YouTube */}
+      {/* Content - Single Column Full Width */}
       <div className="flex-1 overflow-hidden">
-        <div className="h-full flex">
-          {/* Left Column - Form (Full width for YouTube tab) */}
-          <div 
-            className={clsx(
-              'overflow-y-auto p-8',
-              activeTab === 'youtube' ? 'w-full' : 'w-1/2 border-r border-gray-200'
-            )} 
-            data-testid="form-column"
-          >
+        <div className="h-full">
+          {/* Main Content Area */}
+          <div className="h-full overflow-y-auto p-4 md:p-8" data-testid="main-content">
             {activeTab === 'script' && (
-              <ScriptTab
-                project={project}
-                onChange={handleChange}
-                onGenerate={handleGenerateScript}
-                loading={generating.script}
-                onGenerateDescription={handleGenerateDescription}
-                generatingDescription={generatingDescription}
-              />
+              <div className="space-y-6">
+                <ScriptTab
+                  project={project}
+                  onChange={handleChange}
+                  onGenerate={handleGenerateScript}
+                  loading={generating.script}
+                  onGenerateDescription={handleGenerateDescription}
+                  generatingDescription={generatingDescription}
+                />
+                
+                {/* Script Content Editor */}
+                <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-900">Script Content</h3>
+                  <textarea
+                    value={project.script_text || ''}
+                    onChange={(e) => handleChange({ script_text: e.target.value })}
+                    className="input-field font-mono text-sm w-full resize-none"
+                    rows={12}
+                    placeholder="Enter your script here or generate one..."
+                    data-testid="script-content-area"
+                  />
+                  <div className="flex items-center justify-between text-xs text-gray-500">
+                    <span>{(project.script_text || '').length} characters</span>
+                    <span>~{Math.ceil((project.script_text || '').length / 2.5)} seconds</span>
+                  </div>
+                </div>
+              </div>
             )}
+            
             {activeTab === 'audio' && (
               <AudioTab
                 project={project}
@@ -436,6 +449,7 @@ const ProjectEditorPage = () => {
                 generatingSubtitle={generating.subtitle}
               />
             )}
+            
             {activeTab === 'images' && (
               <ImagesTab
                 project={project}
@@ -445,6 +459,7 @@ const ProjectEditorPage = () => {
                 loading={generating.images}
               />
             )}
+            
             {activeTab === 'video' && (
               <VideoTab
                 project={project}
@@ -453,37 +468,11 @@ const ProjectEditorPage = () => {
                 loading={generating.video}
               />
             )}
+            
             {activeTab === 'youtube' && (
               <YouTubeUploadPanel project={project} />
             )}
           </div>
-
-          {/* Right Column - Preview or Script Content (Hidden for YouTube tab) */}
-          {activeTab !== 'youtube' && (
-            <div className="w-1/2 overflow-y-auto p-8 pt-6 bg-gray-50" data-testid="preview-column">
-              {activeTab === 'script' ? (
-                /* Script Content */
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900">Script Content</h3>
-                <textarea
-                  value={project.script_text || ''}
-                  onChange={(e) => handleChange({ script_text: e.target.value })}
-                  className="input-field font-mono text-sm w-full"
-                  rows={25}
-                  placeholder="Enter your script here or generate one..."
-                  data-testid="script-content-area"
-                />
-                <div className="flex items-center justify-between text-xs text-gray-500">
-                  <span>{(project.script_text || '').length} characters</span>
-                  <span>~{Math.ceil((project.script_text || '').length / 2.5)} seconds</span>
-                </div>
-              </div>
-              ) : (
-                /* Preview Panel for other tabs */
-                <PreviewPanel project={project} activeTab={activeTab} />
-              )}
-            </div>
-          )}
         </div>
       </div>
     </div>

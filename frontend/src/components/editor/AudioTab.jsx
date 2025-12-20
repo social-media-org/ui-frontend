@@ -133,15 +133,47 @@ const AudioTab = ({ project, onChange, onGenerate, onGenerateSubtitle, loading, 
       </div>
 
       {/* Audio Preview */}
-      {project.audio_path && (
-        <div className="bg-gray-50 rounded-lg p-4">
-          <label className="block text-sm font-medium text-gray-700 mb-3">
+      {(project.audio_url || project.audio_path) && (
+        <div className="bg-gray-50 rounded-lg p-4 space-y-4">
+          <label className="block text-sm font-medium text-gray-700">
             Audio Preview
           </label>
-          <audio controls className="w-full" data-testid="audio-player">
-            <source src={project.audio_path} type="audio/mpeg" />
-            Your browser does not support the audio element.
-          </audio>
+          
+          {/* Audio Player */}
+          <div className="bg-white rounded-lg p-4">
+            <audio controls className="w-full" data-testid="audio-player">
+              <source src={project.audio_url || project.audio_path} type="audio/mpeg" />
+              <source src={project.audio_url || project.audio_path} type="audio/mp3" />
+              Your browser does not support the audio element.
+            </audio>
+          </div>
+          
+          {/* Audio Info */}
+          <div className="bg-white rounded-lg p-4 space-y-2">
+            <h5 className="font-medium text-gray-800 mb-3">Audio Information</h5>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+              <div>
+                <span className="text-gray-600">Voice:</span>
+                <span className="ml-2 font-medium">{project.voice_id || 'Alloy'}</span>
+              </div>
+              <div>
+                <span className="text-gray-600">Speed:</span>
+                <span className="ml-2 font-medium">{project.audio_speed || 1.0}x</span>
+              </div>
+              <div>
+                <span className="text-gray-600">Pitch:</span>
+                <span className="ml-2 font-medium">{project.audio_pitch || 1.0}</span>
+              </div>
+              {(project.audio_url || project.audio_path) && (
+                <div className="sm:col-span-2 lg:col-span-3">
+                  <span className="text-gray-600">Audio URL:</span>
+                  <span className="ml-2 font-mono text-xs bg-gray-100 px-2 py-1 rounded break-all">
+                    {project.audio_url || project.audio_path}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
 

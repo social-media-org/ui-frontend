@@ -84,13 +84,14 @@ const VideoTab = ({ project, onChange, onGenerate, loading }) => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      {/* Header with Actions */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <h3 className="text-lg font-semibold text-gray-900">Video Configuration</h3>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <button
             onClick={onGenerate}
             disabled={loading || !project.script_text || !project.audio_path}
-            className="btn-primary flex items-center gap-2"
+            className="btn-primary flex items-center justify-center gap-2"
             data-testid="render-video-button"
           >
             {loading ? (
@@ -108,7 +109,7 @@ const VideoTab = ({ project, onChange, onGenerate, loading }) => {
           <button
             onClick={handleAddSubtitles}
             disabled={addingSubtitles || !project.video_url || !project.subtitle_path}
-            className="btn-secondary flex items-center gap-2"
+            className="btn-secondary flex items-center justify-center gap-2"
             data-testid="add-subtitles-button"
           >
             {addingSubtitles ? (
@@ -126,6 +127,7 @@ const VideoTab = ({ project, onChange, onGenerate, loading }) => {
         </div>
       </div>
 
+      {/* Status Messages */}
       {(!project.script_text || !project.audio_path) && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-800">
           <p>⚠️ Please generate script and audio before rendering video.</p>
@@ -144,178 +146,217 @@ const VideoTab = ({ project, onChange, onGenerate, loading }) => {
         </div>
       )}
 
-      {/* Resolution */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Resolution
-        </label>
-        <select
-          value={project.resolution || '1080p'}
-          onChange={(e) => onChange({ resolution: e.target.value })}
-          className="input-field"
-          data-testid="video-resolution-select"
-        >
-          <option value="720p">720p (HD)</option>
-          <option value="1080p">1080p (Full HD)</option>
-          <option value="1440p">1440p (2K)</option>
-          <option value="2160p">2160p (4K)</option>
-        </select>
-      </div>
+      {/* Two-Column Layout: Video Parameters | Subtitle Parameters */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* LEFT: Video Generation Parameters */}
+        <div className="space-y-4">
+          <h4 className="text-md font-medium text-gray-800 border-b border-gray-200 pb-2">
+            Video Parameters
+          </h4>
+          
+          {/* Resolution & FPS on same row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Resolution
+              </label>
+              <select
+                value={project.resolution || '1080p'}
+                onChange={(e) => onChange({ resolution: e.target.value })}
+                className="input-field w-full"
+                data-testid="video-resolution-select"
+              >
+                <option value="720p">720p (HD)</option>
+                <option value="1080p">1080p (Full HD)</option>
+                <option value="1440p">1440p (2K)</option>
+                <option value="2160p">2160p (4K)</option>
+              </select>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Frame Rate (FPS)
+              </label>
+              <div className="flex gap-2">
+                {fpsOptions.map((fps) => (
+                  <button
+                    key={fps}
+                    onClick={() => onChange({ fps })}
+                    className={`flex-1 px-3 py-2 rounded-lg border-2 font-medium text-sm transition-all ${
+                      project.fps === fps
+                        ? 'border-primary-600 bg-primary-50 text-primary-700'
+                        : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                    }`}
+                    data-testid={`fps-${fps}-button`}
+                  >
+                    {fps}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
 
-      {/* Frame Rate */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Frame Rate (FPS)
-        </label>
-        <div className="flex gap-3">
-          {fpsOptions.map((fps) => (
-            <button
-              key={fps}
-              onClick={() => onChange({ fps })}
-              className={`px-6 py-3 rounded-lg border-2 font-medium transition-all ${
-                project.fps === fps
-                  ? 'border-primary-600 bg-primary-50 text-primary-700'
-                  : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
-              }`}
-              data-testid={`fps-${fps}-button`}
-            >
-              {fps}
-            </button>
-          ))}
+          {/* Template & Background Music on same row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Video Template
+              </label>
+              {loadingTemplates ? (
+                <div className="input-field flex items-center gap-2">
+                  <Loader className="w-4 h-4 animate-spin" />
+                  Loading...
+                </div>
+              ) : templates.length === 0 ? (
+                <div className="input-field text-gray-500">
+                  No templates available
+                </div>
+              ) : (
+                <select
+                  value={project.video_template_path || ''}
+                  onChange={(e) => onChange({ video_template_path: e.target.value })}
+                  className="input-field w-full"
+                  data-testid="video-template-select"
+                >
+                  <option value="">Select template...</option>
+                  {templates.map((template) => (
+                    <option key={template.absolute_path} value={template.absolute_path}>
+                      {template.label}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Background Music
+              </label>
+              <select
+                value={project.background_music || ''}
+                onChange={(e) => onChange({ background_music: e.target.value })}
+                className="input-field w-full"
+                data-testid="background-music-select"
+              >
+                <option value="">None</option>
+                <option value="soft">Soft</option>
+                <option value="upbeat">Upbeat</option>
+                <option value="cinematic">Cinematic</option>
+                <option value="corporate">Corporate</option>
+                <option value="ambient">Ambient</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT: Subtitle Parameters */}
+        <div className="space-y-4">
+          <h4 className="text-md font-medium text-gray-800 border-b border-gray-200 pb-2">
+            Subtitle Parameters
+          </h4>
+          
+          {/* Subtitle Style */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Subtitle Style
+            </label>
+            {loadingStyles ? (
+              <div className="input-field flex items-center gap-2">
+                <Loader className="w-4 h-4 animate-spin" />
+                Loading styles...
+              </div>
+            ) : subtitleStyles.length === 0 ? (
+              <div className="input-field text-gray-500">
+                No subtitle styles available
+              </div>
+            ) : (
+              <select
+                value={selectedStyle}
+                onChange={(e) => setSelectedStyle(e.target.value)}
+                className="input-field w-full"
+                data-testid="subtitle-style-select"
+              >
+                {subtitleStyles.map((style) => (
+                  <option key={style.name} value={style.name}>
+                    {style.name} - {style.description}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+
+          {/* Subtitle Position */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Subtitle Position
+            </label>
+            {loadingPositions ? (
+              <div className="input-field flex items-center gap-2">
+                <Loader className="w-4 h-4 animate-spin" />
+                Loading positions...
+              </div>
+            ) : subtitlePositions.length === 0 ? (
+              <div className="input-field text-gray-500">
+                No subtitle positions available
+              </div>
+            ) : (
+              <select
+                value={selectedPosition}
+                onChange={(e) => setSelectedPosition(e.target.value)}
+                className="input-field w-full"
+                data-testid="subtitle-position-select"
+              >
+                {subtitlePositions.map((position) => (
+                  <option key={position.name} value={position.name}>
+                    {position.name} - {position.description}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Motion Template */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Video Template
-        </label>
-        {loadingTemplates ? (
-          <div className="input-field flex items-center gap-2">
-            <Loader className="w-4 h-4 animate-spin" />
-            Loading templates...
-          </div>
-        ) : templates.length === 0 ? (
-          <div className="input-field text-gray-500">
-            No video templates available
-          </div>
-        ) : (
-          <select
-            value={project.video_template_path || ''}
-            onChange={(e) => onChange({ video_template_path: e.target.value })}
-            className="input-field"
-            data-testid="video-template-select"
-          >
-            <option value="">Select a video template...</option>
-            {templates.map((template) => (
-              <option key={template.absolute_path} value={template.absolute_path}>
-                {template.label}
-              </option>
-            ))}
-          </select>
-        )}
-        {project.video_template_path && (
-          <p className="text-xs text-gray-500 mt-1">
-            Selected: {project.video_template_path}
-          </p>
-        )}
-      </div>
-
-      {/* Background Music */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Background Music
-        </label>
-        <select
-          value={project.background_music || ''}
-          onChange={(e) => onChange({ background_music: e.target.value })}
-          className="input-field"
-          data-testid="background-music-select"
-        >
-          <option value="">None</option>
-          <option value="soft">Soft</option>
-          <option value="upbeat">Upbeat</option>
-          <option value="cinematic">Cinematic</option>
-          <option value="corporate">Corporate</option>
-          <option value="ambient">Ambient</option>
-        </select>
-      </div>
-
-      {/* Subtitle Style */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Subtitle Style
-        </label>
-        {loadingStyles ? (
-          <div className="input-field flex items-center gap-2">
-            <Loader className="w-4 h-4 animate-spin" />
-            Loading styles...
-          </div>
-        ) : subtitleStyles.length === 0 ? (
-          <div className="input-field text-gray-500">
-            No subtitle styles available
-          </div>
-        ) : (
-          <select
-            value={selectedStyle}
-            onChange={(e) => setSelectedStyle(e.target.value)}
-            className="input-field"
-            data-testid="subtitle-style-select"
-          >
-            {subtitleStyles.map((style) => (
-              <option key={style.name} value={style.name}>
-                {style.name} - {style.description}
-              </option>
-            ))}
-          </select>
-        )}
-      </div>
-
-      {/* Subtitle Position */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Subtitle Position
-        </label>
-        {loadingPositions ? (
-          <div className="input-field flex items-center gap-2">
-            <Loader className="w-4 h-4 animate-spin" />
-            Loading positions...
-          </div>
-        ) : subtitlePositions.length === 0 ? (
-          <div className="input-field text-gray-500">
-            No subtitle positions available
-          </div>
-        ) : (
-          <select
-            value={selectedPosition}
-            onChange={(e) => setSelectedPosition(e.target.value)}
-            className="input-field"
-            data-testid="subtitle-position-select"
-          >
-            {subtitlePositions.map((position) => (
-              <option key={position.name} value={position.name}>
-                {position.name} - {position.description}
-              </option>
-            ))}
-          </select>
-        )}
-      </div>
-
-      {/* Video Preview */}
+      {/* Video Preview Section */}
       {project.video_url && (
-        <div className="bg-gray-50 rounded-lg p-4">
-          <label className="block text-sm font-medium text-gray-700 mb-3">
+        <div className="bg-gray-50 rounded-lg p-4 space-y-4">
+          <label className="block text-sm font-medium text-gray-700">
             Video Preview
           </label>
-          <div className="aspect-video bg-gray-900 rounded-lg overflow-hidden">
+          
+          {/* Video Player */}
+          <div className="aspect-video bg-gray-900 rounded-lg overflow-hidden max-w-2xl mx-auto">
             <video controls className="w-full h-full" data-testid="video-preview-player">
               <source src={project.video_url} type="video/mp4" />
               Your browser does not support the video tag.
             </video>
           </div>
-          <div className="mt-3 flex items-center justify-between text-sm">
-            <span className="text-gray-600">Duration: {project.duration}s</span>
-            <span className="text-gray-600">{project.resolution} • {project.fps} FPS</span>
+          
+          {/* Video Info */}
+          <div className="bg-white rounded-lg p-4 space-y-2">
+            <h5 className="font-medium text-gray-800 mb-3">Video Information</h5>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+              <div>
+                <span className="text-gray-600">Duration:</span>
+                <span className="ml-2 font-medium">{project.duration}s</span>
+              </div>
+              <div>
+                <span className="text-gray-600">Resolution:</span>
+                <span className="ml-2 font-medium">{project.resolution}</span>
+              </div>
+              <div>
+                <span className="text-gray-600">Frame Rate:</span>
+                <span className="ml-2 font-medium">{project.fps} FPS</span>
+              </div>
+              {project.video_absolute_path && (
+                <div className="sm:col-span-2 lg:col-span-3">
+                  <span className="text-gray-600">File Path:</span>
+                  <span className="ml-2 font-mono text-xs bg-gray-100 px-2 py-1 rounded break-all">
+                    {project.video_absolute_path}
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
