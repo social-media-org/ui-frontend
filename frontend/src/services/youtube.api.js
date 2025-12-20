@@ -1,7 +1,5 @@
 import axios from 'axios';
-
-// YouTube Service Base URL - configurable for Docker Compose
-const YOUTUBE_API_BASE_URL = import.meta.env.VITE_YOUTUBE_API_BASE_URL || 'http://localhost:8005';
+import { YOUTUBE_API_BASE_URL } from '../config';
 
 const youtubeApi = axios.create({
   baseURL: `${YOUTUBE_API_BASE_URL}/api/youtube`,
