@@ -235,10 +235,49 @@ const YouTubeUploadPanel = ({ project }) => {
       {/* Upload Status or Upload Button */}
       {isAuthenticated && isVideoReady && (
         <div className="space-y-6">
-          {isAlreadyUploaded ? (
+              {isAlreadyUploaded ? (
             <>
               {/* Already Uploaded - Show Status */}
               <YouTubeUploadStatus uploadInfo={uploadInfo} />
+
+              {/* Upload Details */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-3">
+                <h4 className="font-semibold text-blue-900">Détails de la publication</h4>
+                
+                {uploadInfo.youtube_url && (
+                  <div>
+                    <p className="text-sm text-gray-600">Lien YouTube :</p>
+                    <a 
+                      href={uploadInfo.youtube_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-600 hover:text-blue-800 underline break-all"
+                    >
+                      {uploadInfo.youtube_url}
+                    </a>
+                  </div>
+                )}
+                
+                {uploadInfo.scheduled_publish_at && (
+                  <div>
+                    <p className="text-sm text-gray-600">Date/Heure de publication programmée :</p>
+                    <p className="text-sm font-medium text-gray-900">
+                      {new Date(uploadInfo.scheduled_publish_at).toLocaleString('fr-FR')}
+                    </p>
+                    {uploadInfo.is_premiere && (
+                      <p className="text-sm text-purple-700 mt-1">📺 Mode Première activé</p>
+                    )}
+                  </div>
+                )}
+
+                {!uploadInfo.scheduled_publish_at && (
+                  <div>
+                    <p className="text-sm text-green-700">
+                      ✅ La vidéo est en ligne sur YouTube
+                    </p>
+                  </div>
+                )}
+              </div>
 
               {/* Actions for uploaded video */}
               <div className="flex flex-wrap gap-3">

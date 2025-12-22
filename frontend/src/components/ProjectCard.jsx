@@ -51,6 +51,29 @@ const ProjectCard = ({ project, onDelete, onPreview, onGenerate }) => {
             <span data-testid="project-duration">{project.duration}s</span>
           )}
         </div>
+
+        {/* YouTube Publication Info */}
+        {(project.status === 'scheduled_for_publish' || project.status === 'uploaded_to_youtube') && (
+          <div className="pt-2 border-t border-gray-200">
+            {project.youtube_scheduled_publish_at && (
+              <p className="text-xs text-purple-700 font-medium">
+                📅 Publication: {new Date(project.youtube_scheduled_publish_at).toLocaleString('fr-FR', { 
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </p>
+            )}
+            {project.youtube_is_premiere && (
+              <p className="text-xs text-purple-700 font-medium mt-1">📺 Mode Première</p>
+            )}
+            {project.youtube_url && project.status === 'uploaded_to_youtube' && (
+              <p className="text-xs text-green-700">✅ En ligne sur YouTube</p>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Action Buttons - Show on hover */}
