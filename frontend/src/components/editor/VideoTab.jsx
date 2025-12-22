@@ -142,7 +142,7 @@ const VideoTab = ({ project, onChange, onGenerate, loading }) => {
 
       {project.video_url && project.subtitle_path && (
         <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-sm text-green-800">
-          <p>✅ Video and subtitles ready. Click "Add Subtitles" to render subtitles on video.</p>
+          
         </div>
       )}
 

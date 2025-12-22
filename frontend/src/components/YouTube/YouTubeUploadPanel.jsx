@@ -169,7 +169,7 @@ const YouTubeUploadPanel = ({ project }) => {
   };
 
   // Check if project is ready for upload
-  const isVideoReady = (project?.status === 'video_ready' || project?.status ===  'scheduled_for_publish') && project?.video_url;
+  const isVideoReady = (['video_ready', 'video_subtitled', 'scheduled_for_publish'].includes(project?.status)) && project?.video_url;
   const isAlreadyUploaded = !!uploadInfo?.youtube_video_id;
   const scheduleSummary = formatScheduleSummary();
 
