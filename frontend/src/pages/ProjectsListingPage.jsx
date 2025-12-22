@@ -156,6 +156,7 @@ const ProjectsListingPage = () => {
           <option value="audio_ready">Audio Ready</option>
           <option value="images_ready">Images Ready</option>
           <option value="video_ready">Video Ready</option>
+<option value="video_subtitled">Video Subtitled</option>
         </select>
 
         {/* New Project Button */}
