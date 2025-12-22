@@ -2,7 +2,7 @@ import axios from 'axios';
 import { YOUTUBE_API_BASE_URL } from '../config';
 
 const youtubeApi = axios.create({
-  baseURL: `${YOUTUBE_API_BASE_URL}/api/youtube`,
+  baseURL: `${YOUTUBE_API_BASE_URL}`,
   headers: {
     'Content-Type': 'application/json',
   },
