@@ -300,7 +300,7 @@ const ProjectEditorPage = () => {
         {
           resolution: project.resolution,
           fps: project.fps,
-        template: project.video_template_path,
+          video_template_path: project.video_template_path,
           background_music: project.background_music,
         }
       );
