@@ -197,6 +197,21 @@ const ScriptTab = ({ project, onChange, onGenerate, loading, onGenerateDescripti
         </div>
       </div>
 
+      {/* Keywords */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Keywords (séparés par des virgules)
+        </label>
+        <input
+          type="text"
+          value={project.keywords || ''}
+          onChange={(e) => onChange({ keywords: e.target.value })}
+          className="input-field"
+          placeholder="mot1, mot2, mot3"
+          data-testid="project-keywords-input"
+        />
+      </div>
+
       {/* Description */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
