@@ -309,7 +309,7 @@ const ProjectEditorPage = () => {
         video_url: updatedProject.video_url,
         duration: updatedProject.duration,
         thumbnail: updatedProject.thumbnail,
-        status: 'video_subtitled',
+        status: 'video_ready',
       });
 
       alert('Video rendered successfully!');
