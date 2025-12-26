@@ -16,9 +16,9 @@ const ProjectCard = ({ project, onDelete, onPreview, onGenerate }) => {
     >
       {/* Thumbnail */}
       <div className="aspect-video bg-gray-100 rounded-lg mb-4 overflow-hidden">
-        {project.thumbnail ? (
+        {project.thumbnail_path ? (
           <img
-            src={project.thumbnail}
+            src={project.thumbnail_path}
             alt={project.title}
             className="w-full h-full object-cover"
             data-testid="project-thumbnail"

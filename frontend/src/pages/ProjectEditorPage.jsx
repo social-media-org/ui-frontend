@@ -308,7 +308,7 @@ const ProjectEditorPage = () => {
       handleChange({
         video_url: updatedProject.video_url,
         duration: updatedProject.duration,
-        thumbnail: updatedProject.thumbnail,
+        thumbnail_path: updatedProject.thumbnail_path,
         status: 'video_ready',
       });
 
