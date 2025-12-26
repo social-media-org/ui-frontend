@@ -242,6 +242,21 @@ const ScriptTab = ({ project, onChange, onGenerate, loading, onGenerateDescripti
         />
       </div>
 
+      {/* Thumbnail Prompt */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Thumbnail Prompt
+        </label>
+        <textarea
+          value={project.thumbnail_prompt || ''}
+          onChange={(e) => onChange({ thumbnail_prompt: e.target.value })}
+          className="input-field"
+          rows={3}
+          placeholder="Enter thumbnail generation prompt"
+          data-testid="thumbnail-prompt-input"
+        />
+      </div>
+
     </div>
   );
 };
