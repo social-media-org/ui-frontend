@@ -197,6 +197,21 @@ const ScriptTab = ({ project, onChange, onGenerate, loading, onGenerateDescripti
         </div>
       </div>
 
+      {/* HeyGen Avatar ID */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          HeyGen Avatar ID
+        </label>
+        <input
+          type="text"
+          value={project.heygen_avatar_id || ''}
+          onChange={(e) => onChange({ heygen_avatar_id: e.target.value })}
+          className="input-field"
+          placeholder="Enter HeyGen avatar identifier"
+          data-testid="heygen-avatar-id-input"
+        />
+      </div>
+
       {/* Keywords */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
