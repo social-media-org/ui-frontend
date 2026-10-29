@@ -18,6 +18,10 @@ RUN npm ci
 # Copy application code
 COPY . .
 
+# Préfixe de déploiement (ex. /socialmedia/)
+ARG VITE_BASE_PATH=/
+ENV VITE_BASE_PATH=$VITE_BASE_PATH
+
 # Build application
 RUN npm run build
 
